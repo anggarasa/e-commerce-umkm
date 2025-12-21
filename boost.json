@@ -1,9 +1,9 @@
 {
     "agents": [
-        "cursor"
+        "gemini"
     ],
     "editors": [
-        "cursor"
+        "vscode"
     ],
     "guidelines": [
         "laravel/fortify"
