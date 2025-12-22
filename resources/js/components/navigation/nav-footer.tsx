@@ -2,12 +2,14 @@ import { Icon } from '@/components/common/icon';
 import {
     SidebarGroup,
     SidebarGroupContent,
+    SidebarGroupLabel,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { resolveUrl } from '@/lib/utils';
 import { type NavItem } from '@/types';
+import { ExternalLink } from 'lucide-react';
 import { type ComponentPropsWithoutRef } from 'react';
 
 export function NavFooter({
@@ -22,13 +24,16 @@ export function NavFooter({
             {...props}
             className={`group-data-[collapsible=icon]:p-0 ${className || ''}`}
         >
+            <SidebarGroupLabel className="text-xs font-semibold tracking-wider text-sidebar-foreground/50 uppercase">
+                Sumber Daya
+            </SidebarGroupLabel>
             <SidebarGroupContent>
-                <SidebarMenu>
+                <SidebarMenu className="mt-2 space-y-1">
                     {items.map((item) => (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
-                                className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
+                                className="group/item text-sidebar-foreground/70 transition-all duration-200 hover:text-sidebar-foreground"
                             >
                                 <a
                                     href={resolveUrl(item.href)}
@@ -38,10 +43,11 @@ export function NavFooter({
                                     {item.icon && (
                                         <Icon
                                             iconNode={item.icon}
-                                            className="h-5 w-5"
+                                            className="size-5"
                                         />
                                     )}
-                                    <span>{item.title}</span>
+                                    <span className="flex-1">{item.title}</span>
+                                    <ExternalLink className="size-3.5 opacity-0 transition-opacity group-hover/item:opacity-50" />
                                 </a>
                             </SidebarMenuButton>
                         </SidebarMenuItem>

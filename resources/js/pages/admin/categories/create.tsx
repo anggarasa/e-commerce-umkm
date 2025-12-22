@@ -22,10 +22,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Category } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Save } from 'lucide-react';
 import { FormEvent, useRef, useState } from 'react';
 
 interface Props {
@@ -89,39 +90,52 @@ export default function CategoriesCreate({ parentCategories }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tambah Kategori" />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6">
+                {/* Header */}
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        asChild
+                        className="shrink-0"
+                    >
                         <Link href={index().url}>
                             <ArrowLeft className="size-4" />
                         </Link>
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">
                             Tambah Kategori
                         </h1>
-                        <p className="text-muted-foreground">
-                            Buat kategori produk baru
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            Buat kategori produk baru untuk katalog Anda
                         </p>
                     </div>
                 </div>
 
+                {/* Form Card */}
                 <Card className="max-w-2xl">
-                    <CardHeader>
-                        <CardTitle>Informasi Kategori</CardTitle>
+                    <CardHeader className="border-b border-border/50 bg-muted/30">
+                        <CardTitle className="text-lg">
+                            Informasi Kategori
+                        </CardTitle>
                         <CardDescription>
-                            Masukkan detail kategori produk
+                            Isi detail kategori produk dengan lengkap
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Parent Category */}
                             <div className="space-y-2">
                                 <Label htmlFor="parent_id">
                                     Kategori Induk
+                                    <span className="ml-1 text-xs text-muted-foreground">
+                                        (opsional)
+                                    </span>
                                 </Label>
                                 <Select name="parent_id">
                                     <SelectTrigger id="parent_id">
-                                        <SelectValue placeholder="Pilih kategori induk (opsional)" />
+                                        <SelectValue placeholder="Pilih kategori induk" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {parentCategories.map((category) => (
@@ -141,8 +155,14 @@ export default function CategoriesCreate({ parentCategories }: Props) {
                                 )}
                             </div>
 
+                            {/* Name */}
                             <div className="space-y-2">
-                                <Label htmlFor="name">Nama Kategori *</Label>
+                                <Label htmlFor="name">
+                                    Nama Kategori
+                                    <span className="ml-1 text-destructive">
+                                        *
+                                    </span>
+                                </Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -152,6 +172,7 @@ export default function CategoriesCreate({ parentCategories }: Props) {
                                     }
                                     placeholder="Contoh: Elektronik"
                                     required
+                                    aria-invalid={!!errors.name}
                                 />
                                 {errors.name && (
                                     <p className="text-sm text-destructive">
@@ -160,6 +181,7 @@ export default function CategoriesCreate({ parentCategories }: Props) {
                                 )}
                             </div>
 
+                            {/* Slug */}
                             <div className="space-y-2">
                                 <Label htmlFor="slug">Slug (URL)</Label>
                                 <Input
@@ -170,9 +192,14 @@ export default function CategoriesCreate({ parentCategories }: Props) {
                                         handleSlugChange(e.target.value)
                                     }
                                     placeholder="contoh: elektronik"
+                                    aria-invalid={!!errors.slug}
                                 />
-                                <p className="text-xs text-muted-foreground">
-                                    URL: /categories/{slug || 'nama-kategori'}
+                                <p className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+                                    URL:{' '}
+                                    <code className="font-mono text-foreground">
+                                        /categories/
+                                        {slug || 'nama-kategori'}
+                                    </code>
                                 </p>
                                 {errors.slug && (
                                     <p className="text-sm text-destructive">
@@ -181,6 +208,7 @@ export default function CategoriesCreate({ parentCategories }: Props) {
                                 )}
                             </div>
 
+                            {/* Icon */}
                             <div className="space-y-2">
                                 <Label>Ikon</Label>
                                 <IconPicker value={icon} onChange={setIcon} />
@@ -191,13 +219,20 @@ export default function CategoriesCreate({ parentCategories }: Props) {
                                 )}
                             </div>
 
+                            {/* Description */}
                             <div className="space-y-2">
-                                <Label htmlFor="description">Deskripsi</Label>
-                                <textarea
+                                <Label htmlFor="description">
+                                    Deskripsi
+                                    <span className="ml-1 text-xs text-muted-foreground">
+                                        (opsional)
+                                    </span>
+                                </Label>
+                                <Textarea
                                     id="description"
                                     name="description"
-                                    className="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                    placeholder="Deskripsi kategori (opsional)"
+                                    placeholder="Jelaskan kategori ini secara singkat..."
+                                    rows={3}
+                                    aria-invalid={!!errors.description}
                                 />
                                 {errors.description && (
                                     <p className="text-sm text-destructive">
@@ -206,28 +241,46 @@ export default function CategoriesCreate({ parentCategories }: Props) {
                                 )}
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            {/* Active Status */}
+                            <div className="flex items-center gap-3 rounded-lg border border-border/50 bg-muted/30 p-4">
                                 <Checkbox
                                     id="is_active"
                                     name="is_active"
                                     defaultChecked
                                 />
-                                <Label
-                                    htmlFor="is_active"
-                                    className="cursor-pointer"
-                                >
-                                    Aktif
-                                </Label>
+                                <div className="flex flex-col">
+                                    <Label
+                                        htmlFor="is_active"
+                                        className="cursor-pointer text-sm font-medium"
+                                    >
+                                        Aktifkan kategori ini
+                                    </Label>
+                                    <p className="text-xs text-muted-foreground">
+                                        Kategori aktif akan ditampilkan di toko
+                                    </p>
+                                </div>
                             </div>
 
-                            <div className="flex gap-4">
-                                <Button type="submit" disabled={processing}>
-                                    {processing && (
-                                        <Loader2 className="mr-2 size-4 animate-spin" />
+                            {/* Action Buttons */}
+                            <div className="flex gap-3 pt-4">
+                                <Button
+                                    type="submit"
+                                    disabled={processing}
+                                    size="lg"
+                                >
+                                    {processing ? (
+                                        <>
+                                            <Loader2 className="size-4 animate-spin" />
+                                            Menyimpan...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save className="size-4" />
+                                            Simpan Kategori
+                                        </>
                                     )}
-                                    Simpan
                                 </Button>
-                                <Button variant="outline" asChild>
+                                <Button variant="outline" asChild size="lg">
                                     <Link href={index().url}>Batal</Link>
                                 </Button>
                             </div>

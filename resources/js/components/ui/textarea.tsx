@@ -2,33 +2,29 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
   return (
-    <input
-      type={type}
-      data-slot="input"
+    <textarea
+      data-slot="textarea"
       className={cn(
         // Base styles
-        "flex h-11 w-full min-w-0 rounded-lg border bg-background px-4 py-2.5 text-base transition-all duration-200 ease-out outline-none",
+        "flex min-h-24 w-full rounded-lg border bg-background px-4 py-3 text-base transition-all duration-200 ease-out outline-none resize-y",
         // Border and shadow
         "border-input shadow-sm",
         // Placeholder
         "placeholder:text-muted-foreground/60",
         // Selection
         "selection:bg-primary/20 selection:text-foreground",
-        // Focus state - modern glow effect
+        // Focus state
         "focus:border-primary focus:ring-4 focus:ring-primary/10 focus:shadow-md focus:shadow-primary/5",
-        // Dark mode focus adjustments
+        // Dark mode focus
         "dark:focus:ring-primary/20 dark:focus:shadow-primary/10",
-        // File input styles
-        "file:inline-flex file:h-8 file:border-0 file:bg-primary/10 file:px-3 file:text-sm file:font-medium file:text-primary file:rounded-md file:cursor-pointer file:transition-colors file:hover:bg-primary/20",
         // Disabled state
         "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted",
         // Error state
         "aria-invalid:border-destructive aria-invalid:ring-destructive/10 dark:aria-invalid:ring-destructive/20",
         // Hover state
-        "hover:border-border/80 hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
-        "dark:hover:shadow-[0_2px_8px_rgba(0,0,0,0.15)]",
+        "hover:border-border/80",
         // Responsive text
         "md:text-sm",
         className
@@ -38,4 +34,4 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   )
 }
 
-export { Input }
+export { Textarea }

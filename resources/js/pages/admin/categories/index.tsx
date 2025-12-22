@@ -56,16 +56,16 @@ function CategoryItem({
     };
 
     return (
-        <div className="border-b last:border-b-0">
+        <div className="border-b border-border/50 last:border-b-0">
             <div
-                className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-muted/50"
+                className="group flex items-center justify-between px-4 py-3.5 transition-all duration-200 hover:bg-muted/30"
                 style={{ paddingLeft: `${level * 24 + 16}px` }}
             >
                 <div className="flex items-center gap-3">
                     {hasChildren && (
                         <button
                             onClick={handleToggle}
-                            className="rounded p-0.5 hover:bg-muted"
+                            className="rounded-md p-1 transition-colors hover:bg-accent"
                             type="button"
                             aria-label={isExpanded ? 'Tutup' : 'Buka'}
                         >
@@ -74,29 +74,38 @@ function CategoryItem({
                             />
                         </button>
                     )}
-                    {!hasChildren && level > 0 && <span className="size-4" />}
-                    {category.icon ? (
-                        <DisplayIcon
-                            iconName={category.icon}
-                            className="size-5 text-primary"
-                        />
-                    ) : (
-                        <FolderTree className="size-5 text-muted-foreground" />
-                    )}
-                    <div>
-                        <span className="font-medium">{category.name}</span>
-                        <span className="ml-2 text-xs text-muted-foreground">
+                    {!hasChildren && level > 0 && <span className="size-6" />}
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                        {category.icon ? (
+                            <DisplayIcon
+                                iconName={category.icon}
+                                className="size-5 text-primary"
+                            />
+                        ) : (
+                            <FolderTree className="size-5 text-primary/70" />
+                        )}
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="font-medium text-foreground">
+                            {category.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
                             /{category.slug}
                         </span>
                     </div>
                     {!category.is_active && (
-                        <span className="rounded bg-yellow-100 px-2 py-0.5 text-xs text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                        <span className="rounded-full bg-warning/10 px-2.5 py-1 text-xs font-medium text-warning">
                             Nonaktif
                         </span>
                     )}
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" asChild>
+                <div className="flex items-center gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        asChild
+                        className="size-9 rounded-lg"
+                    >
                         <Link href={edit(category.slug).url}>
                             <Edit className="size-4" />
                         </Link>
@@ -106,7 +115,7 @@ function CategoryItem({
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="text-destructive hover:text-destructive"
+                                className="size-9 rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
                             >
                                 <Trash2 className="size-4" />
                             </Button>
@@ -115,11 +124,14 @@ function CategoryItem({
                         description={
                             <>
                                 Apakah Anda yakin ingin menghapus kategori "
-                                {category.name}"?
+                                <span className="font-semibold">
+                                    {category.name}
+                                </span>
+                                "?
                                 {hasChildren && (
-                                    <span className="mt-2 block font-medium text-destructive">
-                                        Peringatan: Semua sub-kategori juga akan
-                                        dihapus!
+                                    <span className="mt-3 block rounded-lg bg-destructive/10 p-3 text-sm font-medium text-destructive">
+                                        ⚠️ Peringatan: Semua sub-kategori juga
+                                        akan dihapus!
                                     </span>
                                 )}
                             </>
@@ -145,17 +157,18 @@ export default function CategoriesIndex({ categories }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Kategori" />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div className="flex items-center justify-between">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6">
+                {/* Header */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">
                             Kategori Produk
                         </h1>
-                        <p className="text-muted-foreground">
-                            Kelola kategori produk Anda
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            Kelola kategori dan sub-kategori produk Anda
                         </p>
                     </div>
-                    <Button asChild>
+                    <Button asChild size="lg">
                         <Link href={create().url}>
                             <Plus className="mr-2 size-4" />
                             Tambah Kategori
@@ -163,21 +176,30 @@ export default function CategoriesIndex({ categories }: Props) {
                     </Button>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Daftar Kategori</CardTitle>
+                {/* Category List Card */}
+                <Card className="overflow-hidden">
+                    <CardHeader className="border-b border-border/50 bg-muted/30">
+                        <CardTitle className="text-lg">
+                            Daftar Kategori
+                        </CardTitle>
                         <CardDescription>
-                            Kategori produk dengan hierarki parent-child
+                            Kategori produk dengan struktur hierarki
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
                         {categories.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-12">
-                                <FolderTree className="mb-4 size-12 text-muted-foreground" />
-                                <p className="text-muted-foreground">
+                            <div className="flex flex-col items-center justify-center py-16">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+                                    <FolderTree className="size-8 text-primary" />
+                                </div>
+                                <h3 className="mt-4 text-lg font-semibold text-foreground">
                                     Belum ada kategori
+                                </h3>
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    Mulai dengan menambahkan kategori pertama
+                                    Anda
                                 </p>
-                                <Button asChild className="mt-4">
+                                <Button asChild className="mt-6" size="lg">
                                     <Link href={create().url}>
                                         <Plus className="mr-2 size-4" />
                                         Tambah Kategori
@@ -185,7 +207,7 @@ export default function CategoriesIndex({ categories }: Props) {
                                 </Button>
                             </div>
                         ) : (
-                            <div className="divide-y">
+                            <div className="divide-y divide-border/50">
                                 {categories.map((category) => (
                                     <CategoryItem
                                         key={category.id}
