@@ -198,7 +198,16 @@ export default function ProductsIndex({ products }: Props) {
                 </div>
 
                 <Card>
-                    <CardHeader>
+                    <CardHeader
+                        action={
+                            <Button asChild size="sm">
+                                <Link href={create.url()}>
+                                    <Plus className="mr-2 size-4" />
+                                    Tambah Produk
+                                </Link>
+                            </Button>
+                        }
+                    >
                         <CardTitle>Daftar Produk</CardTitle>
                         <CardDescription>
                             Total {products.total} produk ditemukan

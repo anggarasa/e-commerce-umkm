@@ -178,7 +178,7 @@ export default function CategoriesIndex({ categories }: Props) {
 
                 {/* Category List Card */}
                 <Card className="overflow-hidden">
-                    <CardHeader className="border-b border-border/50 bg-muted/30">
+                    <CardHeader bordered>
                         <CardTitle className="text-lg">
                             Daftar Kategori
                         </CardTitle>
@@ -186,7 +186,7 @@ export default function CategoriesIndex({ categories }: Props) {
                             Kategori produk dengan struktur hierarki
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="p-0">
+                    <CardContent noPadding>
                         {categories.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16">
                                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">

@@ -116,7 +116,7 @@ export default function CategoriesEdit({ category, parentCategories }: Props) {
 
                 {/* Form Card */}
                 <Card className="max-w-2xl">
-                    <CardHeader className="border-b border-border/50 bg-muted/30">
+                    <CardHeader bordered>
                         <CardTitle className="text-lg">
                             Informasi Kategori
                         </CardTitle>
@@ -124,7 +124,7 @@ export default function CategoriesEdit({ category, parentCategories }: Props) {
                             Perbarui detail kategori produk
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-6">
+                    <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Parent Category */}
                             <div className="space-y-2">
