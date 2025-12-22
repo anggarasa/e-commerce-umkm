@@ -32,4 +32,21 @@ return [
         'height' => 400,
         'quality' => 75,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Video Compression Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configure how uploaded videos are compressed and resized.
+    |
+    */
+
+    'video_compression' => [
+        'enabled' => env('VIDEO_COMPRESSION_ENABLED', true),
+        'bitrate' => env('VIDEO_BITRATE', 1000), // kbps
+        'max_width' => env('VIDEO_MAX_WIDTH', 1280),
+        'max_height' => env('VIDEO_MAX_HEIGHT', 720),
+        'format' => 'mp4',
+    ],
 ];

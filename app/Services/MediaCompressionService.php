@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use FFMpeg\Format\Video\X264;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
+use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
 class MediaCompressionService
 {
@@ -23,6 +25,12 @@ class MediaCompressionService
 
     private int $thumbnailQuality;
 
+    private int $videoBitrate;
+
+    private int $videoMaxWidth;
+
+    private int $videoMaxHeight;
+
     public function __construct()
     {
         $this->manager = new ImageManager(new Driver);
@@ -32,6 +40,9 @@ class MediaCompressionService
         $this->thumbnailWidth = config('media.thumbnail.width', 400);
         $this->thumbnailHeight = config('media.thumbnail.height', 400);
         $this->thumbnailQuality = config('media.thumbnail.quality', 75);
+        $this->videoBitrate = config('media.video_compression.bitrate', 1000);
+        $this->videoMaxWidth = config('media.video_compression.max_width', 1280);
+        $this->videoMaxHeight = config('media.video_compression.max_height', 720);
     }
 
     /**
@@ -44,6 +55,18 @@ class MediaCompressionService
         }
 
         return str_starts_with($file->getMimeType(), 'image/');
+    }
+
+    /**
+     * Check if the video file should be compressed.
+     */
+    public function shouldCompressVideo(UploadedFile $file): bool
+    {
+        if (! config('media.video_compression.enabled', true)) {
+            return false;
+        }
+
+        return str_starts_with($file->getMimeType(), 'video/');
     }
 
     /**
@@ -69,6 +92,54 @@ class MediaCompressionService
         Storage::disk('public')->put($path, (string) $encoded);
 
         return $path;
+    }
+
+    /**
+     * Compress and store video using FFMpeg.
+     *
+     * @return string The path to the stored compressed video
+     */
+    public function compressAndStoreVideo(UploadedFile $file, string $directory = 'products'): string
+    {
+        // First, store the original file temporarily
+        $tempPath = $file->store('temp', 'public');
+
+        // Generate unique filename for compressed video
+        $filename = uniqid().'_'.time().'.mp4';
+        $outputPath = $directory.'/'.$filename;
+
+        try {
+            // Create format with compression settings
+            $format = (new X264)
+                ->setKiloBitrate($this->videoBitrate)
+                ->setAudioKiloBitrate(128);
+
+            // Open the video and apply compression
+            FFMpeg::fromDisk('public')
+                ->open($tempPath)
+                ->addFilter(function ($filters) {
+                    // Scale video to max dimensions while maintaining aspect ratio
+                    $filters->resize(
+                        new \FFMpeg\Coordinate\Dimension($this->videoMaxWidth, $this->videoMaxHeight),
+                        \FFMpeg\Filters\Video\ResizeFilter::RESIZEMODE_SCALE_WIDTH
+                    );
+                })
+                ->export()
+                ->toDisk('public')
+                ->inFormat($format)
+                ->save($outputPath);
+
+            // Clean up temp file
+            Storage::disk('public')->delete($tempPath);
+
+            return $outputPath;
+        } catch (\Exception $e) {
+            // If compression fails, clean up and store without compression
+            Storage::disk('public')->delete($tempPath);
+
+            // Fall back to storing without compression
+            return $this->storeWithoutCompression($file, $directory);
+        }
     }
 
     /**
@@ -105,6 +176,45 @@ class MediaCompressionService
         Storage::disk('public')->put($thumbnailPath, (string) $encoded);
 
         return $thumbnailPath;
+    }
+
+    /**
+     * Generate a thumbnail from a video file.
+     *
+     * @return string|null The path to the thumbnail
+     */
+    public function generateVideoThumbnail(string $videoPath, string $directory = 'products/thumbnails'): ?string
+    {
+        if (! config('media.thumbnail.enabled', true)) {
+            return null;
+        }
+
+        try {
+            // Generate thumbnail filename
+            $originalFilename = pathinfo($videoPath, PATHINFO_FILENAME);
+            $thumbnailFilename = $originalFilename.'_thumb.jpg';
+            $thumbnailPath = $directory.'/'.$thumbnailFilename;
+
+            // Extract frame at 1 second (or beginning if video is shorter)
+            FFMpeg::fromDisk('public')
+                ->open($videoPath)
+                ->getFrameFromSeconds(1)
+                ->export()
+                ->toDisk('public')
+                ->save($thumbnailPath);
+
+            // Resize the thumbnail to match image thumbnails
+            $fullPath = Storage::disk('public')->path($thumbnailPath);
+            $image = $this->manager->read($fullPath);
+            $image->cover($this->thumbnailWidth, $this->thumbnailHeight);
+            $encoded = $image->toJpeg($this->thumbnailQuality);
+            Storage::disk('public')->put($thumbnailPath, (string) $encoded);
+
+            return $thumbnailPath;
+        } catch (\Exception $e) {
+            // If thumbnail generation fails, return null
+            return null;
+        }
     }
 
     /**

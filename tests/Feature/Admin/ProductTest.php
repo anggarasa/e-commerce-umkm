@@ -75,4 +75,37 @@ class ProductTest extends TestCase
             ->where('product.id', $product->id)
         );
     }
+
+    public function test_admin_can_create_product_with_video()
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $category = Category::factory()->create();
+        $file = UploadedFile::fake()->create('product.mp4', 1000, 'video/mp4');
+
+        $response = $this->actingAs($user)->post(route('admin.products.store'), [
+            'name' => 'Test Product Video',
+            'slug' => 'test-product-video',
+            'category_id' => $category->id,
+            'price' => 150000,
+            'stock' => 10,
+            'description' => 'Desc',
+            'is_active' => true,
+            'new_media' => [
+                [
+                    'file' => $file,
+                    'type' => 'video',
+                    'is_primary' => true,
+                ],
+            ],
+        ]);
+
+        $response->assertRedirect(route('admin.products.index'));
+        $this->assertDatabaseHas('products', ['slug' => 'test-product-video']);
+
+        $product = Product::where('slug', 'test-product-video')->first();
+        $this->assertCount(1, $product->media);
+        $this->assertEquals('video', $product->media->first()->type);
+        Storage::disk('public')->assertExists($product->media->first()->path);
+    }
 }

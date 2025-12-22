@@ -72,10 +72,13 @@ class ProductController extends Controller
                     $file = $request->file("new_media.{$index}.file");
                     $isImage = $mediaMeta['type'] === 'image';
 
-                    // Compress images, store videos as-is
+                    // Compress images and videos
                     if ($isImage && $this->mediaService->shouldCompress($file)) {
                         $path = $this->mediaService->compressAndStore($file, 'products');
                         $thumbnailPath = $this->mediaService->generateThumbnail($path, 'products/thumbnails');
+                    } elseif (! $isImage && $this->mediaService->shouldCompressVideo($file)) {
+                        $path = $this->mediaService->compressAndStoreVideo($file, 'products');
+                        $thumbnailPath = $this->mediaService->generateVideoThumbnail($path, 'products/thumbnails');
                     } else {
                         $path = $this->mediaService->storeWithoutCompression($file, 'products');
                         $thumbnailPath = null;
@@ -139,10 +142,13 @@ class ProductController extends Controller
                     $file = $request->file("new_media.{$index}.file");
                     $isImage = $mediaMeta['type'] === 'image';
 
-                    // Compress images, store videos as-is
+                    // Compress images and videos
                     if ($isImage && $this->mediaService->shouldCompress($file)) {
                         $path = $this->mediaService->compressAndStore($file, 'products');
                         $thumbnailPath = $this->mediaService->generateThumbnail($path, 'products/thumbnails');
+                    } elseif (! $isImage && $this->mediaService->shouldCompressVideo($file)) {
+                        $path = $this->mediaService->compressAndStoreVideo($file, 'products');
+                        $thumbnailPath = $this->mediaService->generateVideoThumbnail($path, 'products/thumbnails');
                     } else {
                         $path = $this->mediaService->storeWithoutCompression($file, 'products');
                         $thumbnailPath = null;

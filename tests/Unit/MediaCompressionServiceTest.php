@@ -98,4 +98,48 @@ class MediaCompressionServiceTest extends TestCase
         Storage::disk('public')->assertMissing($path);
         Storage::disk('public')->assertMissing($thumbnailPath);
     }
+
+    public function test_should_compress_video_returns_true_for_videos(): void
+    {
+        $file = UploadedFile::fake()->create('test.mp4', 1000, 'video/mp4');
+
+        $this->assertTrue($this->service->shouldCompressVideo($file));
+    }
+
+    public function test_should_compress_video_returns_false_for_images(): void
+    {
+        $file = UploadedFile::fake()->image('test.jpg');
+
+        $this->assertFalse($this->service->shouldCompressVideo($file));
+    }
+
+    public function test_should_compress_video_returns_false_when_disabled(): void
+    {
+        config(['media.video_compression.enabled' => false]);
+        $file = UploadedFile::fake()->create('test.mp4', 1000, 'video/mp4');
+
+        $this->assertFalse($this->service->shouldCompressVideo($file));
+    }
+
+    public function test_compress_and_store_video_falls_back_when_ffmpeg_fails(): void
+    {
+        // FFMpeg is not installed in test environment, so it will fall back
+        $file = UploadedFile::fake()->create('test.mp4', 1000, 'video/mp4');
+
+        $path = $this->service->compressAndStoreVideo($file, 'products');
+
+        // Should fall back to storing without compression
+        $this->assertNotNull($path);
+        $this->assertStringStartsWith('products/', $path);
+        Storage::disk('public')->assertExists($path);
+    }
+
+    public function test_generate_video_thumbnail_returns_null_when_disabled(): void
+    {
+        config(['media.thumbnail.enabled' => false]);
+
+        $result = $this->service->generateVideoThumbnail('some/path.mp4', 'products/thumbnails');
+
+        $this->assertNull($result);
+    }
 }
