@@ -29,6 +29,28 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
+        ], [
+            'username.required' => 'Username wajib diisi.',
+            'username.string' => 'Username harus berupa teks.',
+            'username.max' => 'Username maksimal 255 karakter.',
+            'username.alpha_dash' => 'Username hanya boleh berisi huruf, angka, strip, dan garis bawah.',
+            'username.unique' => 'Username sudah digunakan.',
+            'name.required' => 'Nama wajib diisi.',
+            'name.string' => 'Nama harus berupa teks.',
+            'name.max' => 'Nama maksimal 255 karakter.',
+            'email.required' => 'Email wajib diisi.',
+            'email.string' => 'Email harus berupa teks.',
+            'email.email' => 'Format email tidak valid.',
+            'email.max' => 'Email maksimal 255 karakter.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'password.required' => 'Password wajib diisi.',
+            'password.string' => 'Password harus berupa teks.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ], [
+            'username' => 'username',
+            'name' => 'nama',
+            'email' => 'email',
+            'password' => 'password',
         ])->validate();
 
         return User::create([

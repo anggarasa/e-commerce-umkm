@@ -19,6 +19,12 @@ class ResetUserPassword implements ResetsUserPasswords
     {
         Validator::make($input, [
             'password' => $this->passwordRules(),
+        ], [
+            'password.required' => 'Password baru wajib diisi.',
+            'password.string' => 'Password harus berupa teks.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ], [
+            'password' => 'password',
         ])->validate();
 
         $user->forceFill([

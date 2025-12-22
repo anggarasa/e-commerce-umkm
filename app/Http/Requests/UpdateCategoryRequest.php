@@ -60,4 +60,28 @@ class UpdateCategoryRequest extends FormRequest
             'is_active' => 'status aktif',
         ];
     }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'parent_id.uuid' => 'Format ID kategori induk tidak valid.',
+            'parent_id.exists' => 'Kategori induk yang dipilih tidak ditemukan.',
+            'parent_id.not_in' => 'Kategori tidak dapat menjadi induk dari dirinya sendiri.',
+            'name.required' => 'Nama kategori wajib diisi.',
+            'name.string' => 'Nama kategori harus berupa teks.',
+            'name.max' => 'Nama kategori maksimal 255 karakter.',
+            'slug.string' => 'Slug harus berupa teks.',
+            'slug.max' => 'Slug maksimal 255 karakter.',
+            'slug.unique' => 'Slug sudah digunakan oleh kategori lain.',
+            'icon.string' => 'Ikon harus berupa teks.',
+            'icon.max' => 'Ikon maksimal 100 karakter.',
+            'description.string' => 'Deskripsi harus berupa teks.',
+            'is_active.boolean' => 'Status aktif harus berupa boolean.',
+        ];
+    }
 }
