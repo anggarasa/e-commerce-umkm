@@ -160,19 +160,7 @@ describe('Category Edit', function () {
     });
 });
 
-describe('Category Show', function () {
-    it('shows category details', function () {
-        $category = Category::factory()->create();
 
-        $this->actingAs($this->user)
-            ->get("/admin/categories/{$category->slug}")
-            ->assertStatus(200)
-            ->assertInertia(fn ($page) => $page
-                ->component('admin/categories/show')
-                ->where('category.id', $category->id)
-            );
-    });
-});
 
 describe('Category Delete', function () {
     it('can delete a category', function () {

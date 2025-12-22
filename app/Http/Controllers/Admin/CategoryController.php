@@ -55,17 +55,8 @@ class CategoryController extends Controller
             ->with('success', 'Kategori berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category): Response
-    {
-        $category->load(['parent', 'children']);
 
-        return Inertia::render('admin/categories/show', [
-            'category' => $category,
-        ]);
-    }
+
 
     /**
      * Show the form for editing the specified resource.
