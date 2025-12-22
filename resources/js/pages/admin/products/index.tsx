@@ -8,7 +8,15 @@ import {
 } from '@/components/ui/card';
 import { ColumnDef, DataTable } from '@/components/ui/data-table';
 import { DeleteConfirmationDialog } from '@/components/ui/delete-confirmation-dialog';
+import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/ui/pagination';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib/utils';
 import {
@@ -20,7 +28,8 @@ import {
 } from '@/routes/admin/products';
 import { type BreadcrumbItem, type Product } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Edit, Eye, Package, Plus, Trash2 } from 'lucide-react';
+import { Edit, Eye, Package, Plus, Search, Trash2, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Props {
     products: {
@@ -32,6 +41,13 @@ interface Props {
         from: number;
         to: number;
     };
+    categories: { id: string; name: string }[];
+    filters: {
+        search?: string;
+        category_id?: string;
+        is_active?: string;
+        limit?: number;
+    };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -41,7 +57,77 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function ProductsIndex({ products }: Props) {
+export default function ProductsIndex({
+    products,
+    categories,
+    filters,
+}: Props) {
+    const [search, setSearch] = useState(filters.search || '');
+    const [categoryId, setCategoryId] = useState(filters.category_id || 'all');
+    const [status, setStatus] = useState(filters.is_active ?? 'all');
+
+    // Debounce search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (search !== (filters.search || '')) {
+                router.visit(indexRoute.url(), {
+                    data: {
+                        ...filters,
+                        search: search || null,
+                        page: 1,
+                    },
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                });
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    const handleCategoryChange = (value: string) => {
+        setCategoryId(value);
+        router.visit(indexRoute.url(), {
+            data: {
+                ...filters,
+                category_id: value === 'all' ? null : value,
+                page: 1,
+            },
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
+    const handleStatusChange = (value: string) => {
+        setStatus(value);
+        router.visit(indexRoute.url(), {
+            data: {
+                ...filters,
+                is_active: value === 'all' ? null : value,
+                page: 1,
+            },
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
+    const clearFilters = () => {
+        setSearch('');
+        setCategoryId('all');
+        setStatus('all');
+        router.visit(indexRoute.url(), {
+            data: {
+                limit: filters.limit,
+            },
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
     const handleDelete = (id: string) => {
         return new Promise<void>((resolve) => {
             router.delete(destroy.url(id), {
@@ -196,6 +282,76 @@ export default function ProductsIndex({ products }: Props) {
                         </Link>
                     </Button>
                 </div>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Filter Produk</CardTitle>
+                        <CardDescription>
+                            Cari dan filter produk berdasarkan kriteria
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                            <div className="relative flex-1">
+                                <Search className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Cari nama atau deskripsi..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    className="pl-9"
+                                />
+                            </div>
+                            <Select
+                                value={categoryId}
+                                onValueChange={handleCategoryChange}
+                            >
+                                <SelectTrigger className="w-full md:w-[200px]">
+                                    <SelectValue placeholder="Kategori" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">
+                                        Semua Kategori
+                                    </SelectItem>
+                                    {categories.map((category) => (
+                                        <SelectItem
+                                            key={category.id}
+                                            value={category.id}
+                                        >
+                                            {category.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Select
+                                value={status}
+                                onValueChange={handleStatusChange}
+                            >
+                                <SelectTrigger className="w-full md:w-[150px]">
+                                    <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">
+                                        Semua Status
+                                    </SelectItem>
+                                    <SelectItem value="1">Aktif</SelectItem>
+                                    <SelectItem value="0">Nonaktif</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {(search ||
+                                categoryId !== 'all' ||
+                                status !== 'all') && (
+                                <Button
+                                    variant="ghost"
+                                    onClick={clearFilters}
+                                    className="px-2 lg:px-3"
+                                >
+                                    Reset
+                                    <X className="ml-2 size-4" />
+                                </Button>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
 
                 <Card>
                     <CardHeader

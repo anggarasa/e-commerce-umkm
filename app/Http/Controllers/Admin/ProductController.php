@@ -16,13 +16,36 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $limit = $request->input('limit', 10);
-        $products = Product::with('category', 'media')
-            ->latest()
-            ->paginate($limit)
+
+        $query = Product::with('category', 'media')->latest();
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%');
+            });
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('is_active')) {
+            $query->where('is_active', $request->boolean('is_active'));
+        }
+
+        $products = $query->paginate($limit)
             ->withQueryString();
+
+        $categories = Category::where('is_active', true)
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('admin/products/index', [
             'products' => $products,
+            'categories' => $categories,
+            'filters' => $request->only(['search', 'category_id', 'is_active', 'limit']),
         ]);
     }
 
