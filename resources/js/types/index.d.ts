@@ -41,3 +41,17 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Category {
+    id: string;
+    parent_id: string | null;
+    name: string;
+    slug: string;
+    icon: string | null;
+    description: string | null;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    parent?: Category | null;
+    children?: Category[];
+}

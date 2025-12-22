@@ -1,3 +1,4 @@
+import { index as categoriesIndex } from '@/actions/App/Http/Controllers/CategoryController';
 import { NavFooter } from '@/components/navigation/nav-footer';
 import { NavMain } from '@/components/navigation/nav-main';
 import { NavUser } from '@/components/navigation/nav-user';
@@ -13,7 +14,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Folder, FolderTree, LayoutGrid } from 'lucide-react';
 import AppLogo from '../branding/app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -21,6 +22,11 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Kategori',
+        href: categoriesIndex(),
+        icon: FolderTree,
     },
 ];
 
