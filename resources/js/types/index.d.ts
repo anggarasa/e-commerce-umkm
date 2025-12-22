@@ -55,3 +55,29 @@ export interface Category {
     parent?: Category | null;
     children?: Category[];
 }
+
+export interface ProductMedia {
+    id: string;
+    product_id: string;
+    path: string;
+    type: 'image' | 'video';
+    is_primary: boolean;
+    sort_order: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Product {
+    id: string;
+    category_id: string;
+    name: string;
+    slug: string;
+    price: number;
+    stock: number;
+    description: string | null;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    category?: Category;
+    media?: ProductMedia[];
+}
