@@ -1,4 +1,4 @@
-import { index as categoriesIndex } from '@/actions/App/Http/Controllers/CategoryController';
+import { index as categoriesIndex } from '@/actions/App/Http/Controllers/Admin/CategoryController';
 import { NavFooter } from '@/components/navigation/nav-footer';
 import { NavMain } from '@/components/navigation/nav-main';
 import { NavUser } from '@/components/navigation/nav-user';
@@ -11,7 +11,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { dashboard } from '@/routes/admin';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, FolderTree, LayoutGrid } from 'lucide-react';

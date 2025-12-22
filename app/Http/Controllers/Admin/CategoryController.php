@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
@@ -22,7 +23,7 @@ class CategoryController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('categories/index', [
+        return Inertia::render('admin/categories/index', [
             'categories' => $categories,
         ]);
     }
@@ -37,7 +38,7 @@ class CategoryController extends Controller
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        return Inertia::render('categories/create', [
+        return Inertia::render('admin/categories/create', [
             'parentCategories' => $parentCategories,
         ]);
     }
@@ -50,7 +51,7 @@ class CategoryController extends Controller
         Category::create($request->validated());
 
         return redirect()
-            ->route('categories.index')
+            ->route('admin.categories.index')
             ->with('success', 'Kategori berhasil ditambahkan.');
     }
 
@@ -61,7 +62,7 @@ class CategoryController extends Controller
     {
         $category->load(['parent', 'children']);
 
-        return Inertia::render('categories/show', [
+        return Inertia::render('admin/categories/show', [
             'category' => $category,
         ]);
     }
@@ -77,7 +78,7 @@ class CategoryController extends Controller
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        return Inertia::render('categories/edit', [
+        return Inertia::render('admin/categories/edit', [
             'category' => $category,
             'parentCategories' => $parentCategories,
         ]);
@@ -91,7 +92,7 @@ class CategoryController extends Controller
         $category->update($request->validated());
 
         return redirect()
-            ->route('categories.index')
+            ->route('admin.categories.index')
             ->with('success', 'Kategori berhasil diperbarui.');
     }
 
@@ -103,7 +104,7 @@ class CategoryController extends Controller
         $category->delete();
 
         return redirect()
-            ->route('categories.index')
+            ->route('admin.categories.index')
             ->with('success', 'Kategori berhasil dihapus.');
     }
 }

@@ -1,4 +1,8 @@
-import { index } from '@/actions/App/Http/Controllers/CategoryController';
+import {
+    edit,
+    index,
+    show,
+} from '@/actions/App/Http/Controllers/Admin/CategoryController';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -25,7 +29,7 @@ export default function CategoriesShow({ category }: Props) {
         },
         {
             title: category.name,
-            href: `/categories/${category.slug}`,
+            href: show(category.slug).url,
         },
     ];
 
@@ -60,7 +64,7 @@ export default function CategoriesShow({ category }: Props) {
                         </div>
                     </div>
                     <Button asChild>
-                        <Link href={`/categories/${category.slug}/edit`}>
+                        <Link href={edit(category.slug).url}>
                             <Edit className="mr-2 size-4" />
                             Edit
                         </Link>
@@ -129,7 +133,7 @@ export default function CategoriesShow({ category }: Props) {
                                         Kategori Induk
                                     </p>
                                     <Link
-                                        href={`/categories/${category.parent.slug}`}
+                                        href={show(category.parent.slug).url}
                                         className="text-primary hover:underline"
                                     >
                                         {category.parent.name}
@@ -146,7 +150,9 @@ export default function CategoriesShow({ category }: Props) {
                                             {category.children.map((child) => (
                                                 <li key={child.id}>
                                                     <Link
-                                                        href={`/categories/${child.slug}`}
+                                                        href={
+                                                            show(child.slug).url
+                                                        }
                                                         className="text-primary hover:underline"
                                                     >
                                                         {child.name}

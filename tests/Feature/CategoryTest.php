@@ -10,13 +10,13 @@ beforeEach(function () {
 describe('Category Index', function () {
     it('shows categories page for authenticated users', function () {
         $this->actingAs($this->user)
-            ->get('/categories')
+            ->get('/admin/categories')
             ->assertStatus(200)
-            ->assertInertia(fn ($page) => $page->component('categories/index'));
+            ->assertInertia(fn ($page) => $page->component('admin/categories/index'));
     });
 
     it('redirects unauthenticated users to login', function () {
-        $this->get('/categories')
+        $this->get('/admin/categories')
             ->assertRedirect('/login');
     });
 
@@ -28,7 +28,7 @@ describe('Category Index', function () {
         ]);
 
         $this->actingAs($this->user)
-            ->get('/categories')
+            ->get('/admin/categories')
             ->assertInertia(fn ($page) => $page
                 ->has('categories', 1)
                 ->where('categories.0.name', 'Elektronik')
@@ -40,19 +40,19 @@ describe('Category Index', function () {
 describe('Category Create', function () {
     it('shows create category form', function () {
         $this->actingAs($this->user)
-            ->get('/categories/create')
+            ->get('/admin/categories/create')
             ->assertStatus(200)
-            ->assertInertia(fn ($page) => $page->component('categories/create'));
+            ->assertInertia(fn ($page) => $page->component('admin/categories/create'));
     });
 
     it('can create a category', function () {
         $this->actingAs($this->user)
-            ->post('/categories', [
+            ->post('/admin/categories', [
                 'name' => 'Kategori Baru',
                 'description' => 'Deskripsi kategori',
                 'is_active' => true,
             ])
-            ->assertRedirect('/categories');
+            ->assertRedirect('/admin/categories');
 
         $this->assertDatabaseHas('categories', [
             'name' => 'Kategori Baru',
@@ -62,7 +62,7 @@ describe('Category Create', function () {
 
     it('auto-generates slug from name', function () {
         $this->actingAs($this->user)
-            ->post('/categories', [
+            ->post('/admin/categories', [
                 'name' => 'Kategori Dengan Spasi',
                 'is_active' => true,
             ]);
@@ -77,7 +77,7 @@ describe('Category Create', function () {
         $parent = Category::factory()->create();
 
         $this->actingAs($this->user)
-            ->post('/categories', [
+            ->post('/admin/categories', [
                 'name' => 'Sub Kategori',
                 'parent_id' => $parent->id,
                 'is_active' => true,
@@ -91,7 +91,7 @@ describe('Category Create', function () {
 
     it('validates required name field', function () {
         $this->actingAs($this->user)
-            ->post('/categories', [
+            ->post('/admin/categories', [
                 'is_active' => true,
             ])
             ->assertSessionHasErrors('name');
@@ -101,7 +101,7 @@ describe('Category Create', function () {
         Category::factory()->create(['slug' => 'existing-slug']);
 
         $this->actingAs($this->user)
-            ->post('/categories', [
+            ->post('/admin/categories', [
                 'name' => 'Test',
                 'slug' => 'existing-slug',
                 'is_active' => true,
@@ -115,10 +115,10 @@ describe('Category Edit', function () {
         $category = Category::factory()->create();
 
         $this->actingAs($this->user)
-            ->get("/categories/{$category->slug}/edit")
+            ->get("/admin/categories/{$category->slug}/edit")
             ->assertStatus(200)
             ->assertInertia(fn ($page) => $page
-                ->component('categories/edit')
+                ->component('admin/categories/edit')
                 ->where('category.id', $category->id)
             );
     });
@@ -127,12 +127,12 @@ describe('Category Edit', function () {
         $category = Category::factory()->create(['name' => 'Old Name']);
 
         $this->actingAs($this->user)
-            ->put("/categories/{$category->slug}", [
+            ->put("/admin/categories/{$category->slug}", [
                 'name' => 'New Name',
                 'slug' => 'new-slug',
                 'is_active' => true,
             ])
-            ->assertRedirect('/categories');
+            ->assertRedirect('/admin/categories');
 
         $this->assertDatabaseHas('categories', [
             'id' => $category->id,
@@ -145,12 +145,12 @@ describe('Category Edit', function () {
         $category = Category::factory()->create(['slug' => 'my-slug']);
 
         $this->actingAs($this->user)
-            ->put("/categories/{$category->slug}", [
+            ->put("/admin/categories/{$category->slug}", [
                 'name' => 'Updated Name',
                 'slug' => 'my-slug',
                 'is_active' => true,
             ])
-            ->assertRedirect('/categories');
+            ->assertRedirect('/admin/categories');
 
         $this->assertDatabaseHas('categories', [
             'id' => $category->id,
@@ -165,10 +165,10 @@ describe('Category Show', function () {
         $category = Category::factory()->create();
 
         $this->actingAs($this->user)
-            ->get("/categories/{$category->slug}")
+            ->get("/admin/categories/{$category->slug}")
             ->assertStatus(200)
             ->assertInertia(fn ($page) => $page
-                ->component('categories/show')
+                ->component('admin/categories/show')
                 ->where('category.id', $category->id)
             );
     });
@@ -179,8 +179,8 @@ describe('Category Delete', function () {
         $category = Category::factory()->create();
 
         $this->actingAs($this->user)
-            ->delete("/categories/{$category->slug}")
-            ->assertRedirect('/categories');
+            ->delete("/admin/categories/{$category->slug}")
+            ->assertRedirect('/admin/categories');
 
         $this->assertDatabaseMissing('categories', [
             'id' => $category->id,
@@ -192,7 +192,7 @@ describe('Category Delete', function () {
         $child = Category::factory()->create(['parent_id' => $parent->id]);
 
         $this->actingAs($this->user)
-            ->delete("/categories/{$parent->slug}");
+            ->delete("/admin/categories/{$parent->slug}");
 
         $this->assertDatabaseMissing('categories', ['id' => $parent->id]);
         $this->assertDatabaseMissing('categories', ['id' => $child->id]);

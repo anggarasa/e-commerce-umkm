@@ -1,7 +1,9 @@
 import {
+    create,
     destroy,
+    edit,
     index,
-} from '@/actions/App/Http/Controllers/CategoryController';
+} from '@/actions/App/Http/Controllers/Admin/CategoryController';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -95,7 +97,7 @@ function CategoryItem({
                 </div>
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/categories/${category.slug}/edit`}>
+                        <Link href={edit(category.slug).url}>
                             <Edit className="size-4" />
                         </Link>
                     </Button>
@@ -154,7 +156,7 @@ export default function CategoriesIndex({ categories }: Props) {
                         </p>
                     </div>
                     <Button asChild>
-                        <Link href="/categories/create">
+                        <Link href={create().url}>
                             <Plus className="mr-2 size-4" />
                             Tambah Kategori
                         </Link>
@@ -176,7 +178,7 @@ export default function CategoriesIndex({ categories }: Props) {
                                     Belum ada kategori
                                 </p>
                                 <Button asChild className="mt-4">
-                                    <Link href="/categories/create">
+                                    <Link href={create().url}>
                                         <Plus className="mr-2 size-4" />
                                         Tambah Kategori
                                     </Link>

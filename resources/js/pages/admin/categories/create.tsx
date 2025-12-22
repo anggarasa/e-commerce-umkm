@@ -1,7 +1,8 @@
 import {
+    create,
     index,
-    update,
-} from '@/actions/App/Http/Controllers/CategoryController';
+    store,
+} from '@/actions/App/Http/Controllers/Admin/CategoryController';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -28,9 +29,19 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { FormEvent, useRef, useState } from 'react';
 
 interface Props {
-    category: Category;
     parentCategories: Pick<Category, 'id' | 'name'>[];
 }
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Kategori',
+        href: index().url,
+    },
+    {
+        title: 'Tambah Kategori',
+        href: create().url,
+    },
+];
 
 function generateSlug(text: string): string {
     return text
@@ -41,24 +52,13 @@ function generateSlug(text: string): string {
         .trim();
 }
 
-export default function CategoriesEdit({ category, parentCategories }: Props) {
-    const [name, setName] = useState(category.name);
-    const [slug, setSlug] = useState(category.slug);
-    const [icon, setIcon] = useState(category.icon || '');
+export default function CategoriesCreate({ parentCategories }: Props) {
+    const [name, setName] = useState('');
+    const [slug, setSlug] = useState('');
+    const [icon, setIcon] = useState('');
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const slugManuallyEdited = useRef(true); // Start true for edit mode
-
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Kategori',
-            href: index().url,
-        },
-        {
-            title: category.name,
-            href: `/categories/${category.slug}/edit`,
-        },
-    ];
+    const slugManuallyEdited = useRef(false);
 
     const handleNameChange = (value: string) => {
         setName(value);
@@ -80,7 +80,7 @@ export default function CategoriesEdit({ category, parentCategories }: Props) {
         data.is_active = formData.has('is_active') ? '1' : '0';
 
         setProcessing(true);
-        router.put(update(category.slug).url, data, {
+        router.post(store().url, data, {
             onError: (errs) => setErrors(errs),
             onFinish: () => setProcessing(false),
         });
@@ -88,7 +88,7 @@ export default function CategoriesEdit({ category, parentCategories }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Edit ${category.name}`} />
+            <Head title="Tambah Kategori" />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" size="icon" asChild>
@@ -98,10 +98,10 @@ export default function CategoriesEdit({ category, parentCategories }: Props) {
                     </Button>
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Edit Kategori
+                            Tambah Kategori
                         </h1>
                         <p className="text-muted-foreground">
-                            Ubah detail kategori "{category.name}"
+                            Buat kategori produk baru
                         </p>
                     </div>
                 </div>
@@ -110,7 +110,7 @@ export default function CategoriesEdit({ category, parentCategories }: Props) {
                     <CardHeader>
                         <CardTitle>Informasi Kategori</CardTitle>
                         <CardDescription>
-                            Ubah detail kategori produk
+                            Masukkan detail kategori produk
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -119,22 +119,17 @@ export default function CategoriesEdit({ category, parentCategories }: Props) {
                                 <Label htmlFor="parent_id">
                                     Kategori Induk
                                 </Label>
-                                <Select
-                                    name="parent_id"
-                                    defaultValue={
-                                        category.parent_id || undefined
-                                    }
-                                >
+                                <Select name="parent_id">
                                     <SelectTrigger id="parent_id">
                                         <SelectValue placeholder="Pilih kategori induk (opsional)" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {parentCategories.map((cat) => (
+                                        {parentCategories.map((category) => (
                                             <SelectItem
-                                                key={cat.id}
-                                                value={cat.id}
+                                                key={category.id}
+                                                value={category.id}
                                             >
-                                                {cat.name}
+                                                {category.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -177,7 +172,7 @@ export default function CategoriesEdit({ category, parentCategories }: Props) {
                                     placeholder="contoh: elektronik"
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    URL: /categories/{slug}
+                                    URL: /categories/{slug || 'nama-kategori'}
                                 </p>
                                 {errors.slug && (
                                     <p className="text-sm text-destructive">
@@ -203,7 +198,6 @@ export default function CategoriesEdit({ category, parentCategories }: Props) {
                                     name="description"
                                     className="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                     placeholder="Deskripsi kategori (opsional)"
-                                    defaultValue={category.description || ''}
                                 />
                                 {errors.description && (
                                     <p className="text-sm text-destructive">
@@ -216,7 +210,7 @@ export default function CategoriesEdit({ category, parentCategories }: Props) {
                                 <Checkbox
                                     id="is_active"
                                     name="is_active"
-                                    defaultChecked={category.is_active}
+                                    defaultChecked
                                 />
                                 <Label
                                     htmlFor="is_active"
@@ -231,7 +225,7 @@ export default function CategoriesEdit({ category, parentCategories }: Props) {
                                     {processing && (
                                         <Loader2 className="mr-2 size-4 animate-spin" />
                                     )}
-                                    Simpan Perubahan
+                                    Simpan
                                 </Button>
                                 <Button variant="outline" asChild>
                                     <Link href={index().url}>Batal</Link>
