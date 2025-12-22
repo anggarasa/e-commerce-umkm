@@ -24,7 +24,15 @@ import { DisplayIcon } from '@/components/ui/icon-picker';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Category } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { ChevronRight, Edit, FolderTree, Plus, Trash2 } from 'lucide-react';
+import {
+    ChevronRight,
+    Edit,
+    FolderTree,
+    Loader2,
+    Plus,
+    Trash2,
+} from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
     categories: Category[];
@@ -44,10 +52,21 @@ function CategoryItem({
     category: Category;
     level?: number;
 }) {
+    const [isExpanded, setIsExpanded] = useState(true);
+    const [isDeleting, setIsDeleting] = useState(false);
     const hasChildren = category.children && category.children.length > 0;
 
     const handleDelete = () => {
-        router.delete(destroy(category.slug).url);
+        setIsDeleting(true);
+        router.delete(destroy(category.slug).url, {
+            onFinish: () => setIsDeleting(false),
+        });
+    };
+
+    const handleToggle = () => {
+        if (hasChildren) {
+            setIsExpanded(!isExpanded);
+        }
     };
 
     return (
@@ -58,7 +77,16 @@ function CategoryItem({
             >
                 <div className="flex items-center gap-3">
                     {hasChildren && (
-                        <ChevronRight className="size-4 text-muted-foreground" />
+                        <button
+                            onClick={handleToggle}
+                            className="rounded p-0.5 hover:bg-muted"
+                            type="button"
+                            aria-label={isExpanded ? 'Tutup' : 'Buka'}
+                        >
+                            <ChevronRight
+                                className={`size-4 text-muted-foreground transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+                            />
+                        </button>
                     )}
                     {!hasChildren && level > 0 && <span className="size-4" />}
                     {category.icon ? (
@@ -118,8 +146,16 @@ function CategoryItem({
                                 <Button
                                     variant="destructive"
                                     onClick={handleDelete}
+                                    disabled={isDeleting}
                                 >
-                                    Hapus
+                                    {isDeleting ? (
+                                        <>
+                                            <Loader2 className="mr-2 size-4 animate-spin" />
+                                            Menghapus...
+                                        </>
+                                    ) : (
+                                        'Hapus'
+                                    )}
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
@@ -127,6 +163,7 @@ function CategoryItem({
                 </div>
             </div>
             {hasChildren &&
+                isExpanded &&
                 category.children!.map((child) => (
                     <CategoryItem
                         key={child.id}
