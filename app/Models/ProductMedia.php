@@ -14,6 +14,7 @@ class ProductMedia extends Model
     protected $fillable = [
         'product_id',
         'path',
+        'thumbnail_path',
         'type',
         'is_primary',
         'sort_order',
@@ -24,8 +25,24 @@ class ProductMedia extends Model
         'sort_order' => 'integer',
     ];
 
+    protected $appends = ['url', 'thumbnail_url'];
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return asset('storage/'.$this->path);
+    }
+
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        if (! $this->thumbnail_path) {
+            return null;
+        }
+
+        return asset('storage/'.$this->thumbnail_path);
     }
 }

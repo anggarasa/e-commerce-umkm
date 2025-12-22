@@ -7,12 +7,16 @@ use App\Http\Requests\Admin\Product\StoreProductRequest;
 use App\Http\Requests\Admin\Product\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\MediaCompressionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProductController extends Controller
 {
+    public function __construct(
+        private MediaCompressionService $mediaService
+    ) {}
+
     public function index(Request $request)
     {
         $limit = $request->input('limit', 10);
@@ -66,9 +70,20 @@ class ProductController extends Controller
             foreach ($request->input('new_media') as $index => $mediaMeta) {
                 if ($request->hasFile("new_media.{$index}.file")) {
                     $file = $request->file("new_media.{$index}.file");
-                    $path = $file->store('products', 'public');
+                    $isImage = $mediaMeta['type'] === 'image';
+
+                    // Compress images, store videos as-is
+                    if ($isImage && $this->mediaService->shouldCompress($file)) {
+                        $path = $this->mediaService->compressAndStore($file, 'products');
+                        $thumbnailPath = $this->mediaService->generateThumbnail($path, 'products/thumbnails');
+                    } else {
+                        $path = $this->mediaService->storeWithoutCompression($file, 'products');
+                        $thumbnailPath = null;
+                    }
+
                     $product->media()->create([
                         'path' => $path,
+                        'thumbnail_path' => $thumbnailPath,
                         'type' => $mediaMeta['type'],
                         'is_primary' => filter_var($mediaMeta['is_primary'] ?? false, FILTER_VALIDATE_BOOLEAN),
                         'sort_order' => $index,
@@ -77,7 +92,7 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dibuat.');
     }
 
     public function show(Product $product)
@@ -109,9 +124,7 @@ class ProductController extends Controller
             foreach ($request->input('deleted_media') as $mediaId) {
                 $media = $product->media()->find($mediaId);
                 if ($media) {
-                    if (Storage::disk('public')->exists($media->path)) {
-                        Storage::disk('public')->delete($media->path);
-                    }
+                    $this->mediaService->deleteMedia($media->path, $media->thumbnail_path);
                     $media->delete();
                 }
             }
@@ -124,9 +137,20 @@ class ProductController extends Controller
             foreach ($request->input('new_media') as $index => $mediaMeta) {
                 if ($request->hasFile("new_media.{$index}.file")) {
                     $file = $request->file("new_media.{$index}.file");
-                    $path = $file->store('products', 'public');
+                    $isImage = $mediaMeta['type'] === 'image';
+
+                    // Compress images, store videos as-is
+                    if ($isImage && $this->mediaService->shouldCompress($file)) {
+                        $path = $this->mediaService->compressAndStore($file, 'products');
+                        $thumbnailPath = $this->mediaService->generateThumbnail($path, 'products/thumbnails');
+                    } else {
+                        $path = $this->mediaService->storeWithoutCompression($file, 'products');
+                        $thumbnailPath = null;
+                    }
+
                     $product->media()->create([
                         'path' => $path,
+                        'thumbnail_path' => $thumbnailPath,
                         'type' => $mediaMeta['type'],
                         'is_primary' => filter_var($mediaMeta['is_primary'] ?? false, FILTER_VALIDATE_BOOLEAN),
                         'sort_order' => $currentMaxSort + 1 + $index,
@@ -135,18 +159,16 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil diperbarui.');
     }
 
     public function destroy(Product $product)
     {
         foreach ($product->media as $media) {
-            if (Storage::disk('public')->exists($media->path)) {
-                Storage::disk('public')->delete($media->path);
-            }
+            $this->mediaService->deleteMedia($media->path, $media->thumbnail_path);
         }
         $product->delete();
 
-        return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dihapus.');
     }
 }

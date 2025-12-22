@@ -60,6 +60,9 @@ export interface ProductMedia {
     id: string;
     product_id: string;
     path: string;
+    thumbnail_path: string | null;
+    url: string;
+    thumbnail_url: string | null;
     type: 'image' | 'video';
     is_primary: boolean;
     sort_order: number;
