@@ -10,28 +10,12 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
+import { DeleteConfirmationDialog } from '@/components/ui/delete-confirmation-dialog';
 import { DisplayIcon } from '@/components/ui/icon-picker';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Category } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import {
-    ChevronRight,
-    Edit,
-    FolderTree,
-    Loader2,
-    Plus,
-    Trash2,
-} from 'lucide-react';
+import { ChevronRight, Edit, FolderTree, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface Props {
@@ -53,13 +37,13 @@ function CategoryItem({
     level?: number;
 }) {
     const [isExpanded, setIsExpanded] = useState(true);
-    const [isDeleting, setIsDeleting] = useState(false);
     const hasChildren = category.children && category.children.length > 0;
 
     const handleDelete = () => {
-        setIsDeleting(true);
-        router.delete(destroy(category.slug).url, {
-            onFinish: () => setIsDeleting(false),
+        return new Promise<void>((resolve) => {
+            router.delete(destroy(category.slug).url, {
+                onFinish: () => resolve(),
+            });
         });
     };
 
@@ -115,8 +99,8 @@ function CategoryItem({
                             <Edit className="size-4" />
                         </Link>
                     </Button>
-                    <Dialog>
-                        <DialogTrigger asChild>
+                    <DeleteConfirmationDialog
+                        trigger={
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -124,42 +108,22 @@ function CategoryItem({
                             >
                                 <Trash2 className="size-4" />
                             </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Hapus Kategori</DialogTitle>
-                                <DialogDescription>
-                                    Apakah Anda yakin ingin menghapus kategori "
-                                    {category.name}"?
-                                    {hasChildren && (
-                                        <span className="mt-2 block font-medium text-destructive">
-                                            Peringatan: Semua sub-kategori juga
-                                            akan dihapus!
-                                        </span>
-                                    )}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button variant="outline">Batal</Button>
-                                </DialogClose>
-                                <Button
-                                    variant="destructive"
-                                    onClick={handleDelete}
-                                    disabled={isDeleting}
-                                >
-                                    {isDeleting ? (
-                                        <>
-                                            <Loader2 className="mr-2 size-4 animate-spin" />
-                                            Menghapus...
-                                        </>
-                                    ) : (
-                                        'Hapus'
-                                    )}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                        }
+                        title="Hapus Kategori"
+                        description={
+                            <>
+                                Apakah Anda yakin ingin menghapus kategori "
+                                {category.name}"?
+                                {hasChildren && (
+                                    <span className="mt-2 block font-medium text-destructive">
+                                        Peringatan: Semua sub-kategori juga akan
+                                        dihapus!
+                                    </span>
+                                )}
+                            </>
+                        }
+                        onConfirm={handleDelete}
+                    />
                 </div>
             </div>
             {hasChildren &&
