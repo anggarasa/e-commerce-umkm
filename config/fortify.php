@@ -144,7 +144,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Features::registration(), // Disabled - registration is not allowed
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([
