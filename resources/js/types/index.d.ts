@@ -84,3 +84,21 @@ export interface Product {
     category?: Category;
     media?: ProductMedia[];
 }
+
+export interface ProductFilters {
+    search?: string;
+    category?: string;
+    min_price?: number;
+    max_price?: number;
+    sort?:
+        | 'newest'
+        | 'oldest'
+        | 'price_asc'
+        | 'price_desc'
+        | 'name_asc'
+        | 'name_desc';
+}
+
+export interface CategoryWithCount extends Category {
+    products_count: number;
+}

@@ -15,6 +15,14 @@ class Category extends Model
     use HasFactory, HasUuids;
 
     /**
+     * Get the products for the category.
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

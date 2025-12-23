@@ -1,0 +1,563 @@
+
+C:\laragon\www\e-commerce\resources\js\pages\storefront\products\index.tsx
+  286:34  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\laragon\www\e-commerce\resources\js\pages\storefront\products\index.tsx:286:34
+  284 |                             </CardHeader>
+  285 |                             <CardContent>
+> 286 |                                 <FilterSidebar
+      |                                  ^^^^^^^^^^^^^ This component is created during render
+  287 |                                     categories={categories}
+  288 |                                     filters={filters}
+  289 |                                     localFilters={localFilters}
+
+C:\laragon\www\e-commerce\resources\js\pages\storefront\products\index.tsx:131:27
+  129 |         filters.max_price;
+  130 |
+> 131 |     const FilterSidebar = ({
+      |                           ^^
+> 132 |         categories,
+      | ^^^^^^^^^^^^^^^^^^^
+> 133 |         filters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 134 |         localFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 135 |         setLocalFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 136 |         applyFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 137 |         clearFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 138 |         hasActiveFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 139 |     }: {
+      | ^^^^^^^^^^^^^^^^^^^
+> 140 |         categories: CategoryWithCount[];
+      | ^^^^^^^^^^^^^^^^^^^
+> 141 |         filters: ProductFilters;
+      | ^^^^^^^^^^^^^^^^^^^
+> 142 |         localFilters: ProductFilters;
+      | ^^^^^^^^^^^^^^^^^^^
+> 143 |         setLocalFilters: (filters: ProductFilters) => void;
+      | ^^^^^^^^^^^^^^^^^^^
+> 144 |         applyFilters: (newFilters: Partial<ProductFilters>) => void;
+      | ^^^^^^^^^^^^^^^^^^^
+> 145 |         clearFilters: () => void;
+      | ^^^^^^^^^^^^^^^^^^^
+> 146 |         hasActiveFilters?: string | number | boolean;
+      | ^^^^^^^^^^^^^^^^^^^
+> 147 |     }) => (
+      | ^^^^^^^^^^^^^^^^^^^
+> 148 |         <div className="space-y-6">
+      | ^^^^^^^^^^^^^^^^^^^
+> 149 |             {/* Categories */}
+      | ^^^^^^^^^^^^^^^^^^^
+> 150 |             <div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 151 |                 <Label className="mb-3 block text-sm font-semibold">
+      | ^^^^^^^^^^^^^^^^^^^
+> 152 |                     Kategori
+      | ^^^^^^^^^^^^^^^^^^^
+> 153 |                 </Label>
+      | ^^^^^^^^^^^^^^^^^^^
+> 154 |                 <div className="space-y-2">
+      | ^^^^^^^^^^^^^^^^^^^
+> 155 |                     <button
+      | ^^^^^^^^^^^^^^^^^^^
+> 156 |                         onClick={() => applyFilters({ category: undefined })}
+      | ^^^^^^^^^^^^^^^^^^^
+> 157 |                         className={cn(
+      | ^^^^^^^^^^^^^^^^^^^
+> 158 |                             'w-full rounded-lg px-3 py-2 text-left text-sm transition-colors',
+      | ^^^^^^^^^^^^^^^^^^^
+> 159 |                             !filters.category
+      | ^^^^^^^^^^^^^^^^^^^
+> 160 |                                 ? 'bg-primary text-primary-foreground'
+      | ^^^^^^^^^^^^^^^^^^^
+> 161 |                                 : 'hover:bg-muted',
+      | ^^^^^^^^^^^^^^^^^^^
+> 162 |                         )}
+      | ^^^^^^^^^^^^^^^^^^^
+> 163 |                     >
+      | ^^^^^^^^^^^^^^^^^^^
+> 164 |                         Semua Kategori
+      | ^^^^^^^^^^^^^^^^^^^
+> 165 |                     </button>
+      | ^^^^^^^^^^^^^^^^^^^
+> 166 |                     {categories.map((category) => (
+      | ^^^^^^^^^^^^^^^^^^^
+> 167 |                         <button
+      | ^^^^^^^^^^^^^^^^^^^
+> 168 |                             key={category.id}
+      | ^^^^^^^^^^^^^^^^^^^
+> 169 |                             onClick={() =>
+      | ^^^^^^^^^^^^^^^^^^^
+> 170 |                                 applyFilters({ category: category.slug })
+      | ^^^^^^^^^^^^^^^^^^^
+> 171 |                             }
+      | ^^^^^^^^^^^^^^^^^^^
+> 172 |                             className={cn(
+      | ^^^^^^^^^^^^^^^^^^^
+> 173 |                                 'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors',
+      | ^^^^^^^^^^^^^^^^^^^
+> 174 |                                 filters.category === category.slug
+      | ^^^^^^^^^^^^^^^^^^^
+> 175 |                                     ? 'bg-primary text-primary-foreground'
+      | ^^^^^^^^^^^^^^^^^^^
+> 176 |                                     : 'hover:bg-muted',
+      | ^^^^^^^^^^^^^^^^^^^
+> 177 |                             )}
+      | ^^^^^^^^^^^^^^^^^^^
+> 178 |                         >
+      | ^^^^^^^^^^^^^^^^^^^
+> 179 |                             <span>{category.name}</span>
+      | ^^^^^^^^^^^^^^^^^^^
+> 180 |                             <span
+      | ^^^^^^^^^^^^^^^^^^^
+> 181 |                                 className={cn(
+      | ^^^^^^^^^^^^^^^^^^^
+> 182 |                                     'text-xs',
+      | ^^^^^^^^^^^^^^^^^^^
+> 183 |                                     filters.category === category.slug
+      | ^^^^^^^^^^^^^^^^^^^
+> 184 |                                         ? 'text-primary-foreground/70'
+      | ^^^^^^^^^^^^^^^^^^^
+> 185 |                                         : 'text-muted-foreground',
+      | ^^^^^^^^^^^^^^^^^^^
+> 186 |                                 )}
+      | ^^^^^^^^^^^^^^^^^^^
+> 187 |                             >
+      | ^^^^^^^^^^^^^^^^^^^
+> 188 |                                 {category.products_count}
+      | ^^^^^^^^^^^^^^^^^^^
+> 189 |                             </span>
+      | ^^^^^^^^^^^^^^^^^^^
+> 190 |                         </button>
+      | ^^^^^^^^^^^^^^^^^^^
+> 191 |                     ))}
+      | ^^^^^^^^^^^^^^^^^^^
+> 192 |                 </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 193 |             </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 194 |
+      | ^^^^^^^^^^^^^^^^^^^
+> 195 |             {/* Price Range */}
+      | ^^^^^^^^^^^^^^^^^^^
+> 196 |             <div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 197 |                 <Label className="mb-3 block text-sm font-semibold">
+      | ^^^^^^^^^^^^^^^^^^^
+> 198 |                     Rentang Harga
+      | ^^^^^^^^^^^^^^^^^^^
+> 199 |                 </Label>
+      | ^^^^^^^^^^^^^^^^^^^
+> 200 |                 <div className="grid grid-cols-2 gap-2">
+      | ^^^^^^^^^^^^^^^^^^^
+> 201 |                     <div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 202 |                         <Label className="mb-1 text-xs text-muted-foreground">
+      | ^^^^^^^^^^^^^^^^^^^
+> 203 |                             Min
+      | ^^^^^^^^^^^^^^^^^^^
+> 204 |                         </Label>
+      | ^^^^^^^^^^^^^^^^^^^
+> 205 |                         <Input
+      | ^^^^^^^^^^^^^^^^^^^
+> 206 |                             type="number"
+      | ^^^^^^^^^^^^^^^^^^^
+> 207 |                             placeholder="0"
+      | ^^^^^^^^^^^^^^^^^^^
+> 208 |                             value={localFilters.min_price || ''}
+      | ^^^^^^^^^^^^^^^^^^^
+> 209 |                             onChange={(e) =>
+      | ^^^^^^^^^^^^^^^^^^^
+> 210 |                                 setLocalFilters({
+      | ^^^^^^^^^^^^^^^^^^^
+> 211 |                                     ...localFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 212 |                                     min_price:
+      | ^^^^^^^^^^^^^^^^^^^
+> 213 |                                         Number(e.target.value) || undefined,
+      | ^^^^^^^^^^^^^^^^^^^
+> 214 |                                 })
+      | ^^^^^^^^^^^^^^^^^^^
+> 215 |                             }
+      | ^^^^^^^^^^^^^^^^^^^
+> 216 |                             onBlur={() =>
+      | ^^^^^^^^^^^^^^^^^^^
+> 217 |                                 applyFilters({
+      | ^^^^^^^^^^^^^^^^^^^
+> 218 |                                     min_price: localFilters.min_price,
+      | ^^^^^^^^^^^^^^^^^^^
+> 219 |                                 })
+      | ^^^^^^^^^^^^^^^^^^^
+> 220 |                             }
+      | ^^^^^^^^^^^^^^^^^^^
+> 221 |                         />
+      | ^^^^^^^^^^^^^^^^^^^
+> 222 |                     </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 223 |                     <div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 224 |                         <Label className="mb-1 text-xs text-muted-foreground">
+      | ^^^^^^^^^^^^^^^^^^^
+> 225 |                             Max
+      | ^^^^^^^^^^^^^^^^^^^
+> 226 |                         </Label>
+      | ^^^^^^^^^^^^^^^^^^^
+> 227 |                         <Input
+      | ^^^^^^^^^^^^^^^^^^^
+> 228 |                             type="number"
+      | ^^^^^^^^^^^^^^^^^^^
+> 229 |                             placeholder="1000000"
+      | ^^^^^^^^^^^^^^^^^^^
+> 230 |                             value={localFilters.max_price || ''}
+      | ^^^^^^^^^^^^^^^^^^^
+> 231 |                             onChange={(e) =>
+      | ^^^^^^^^^^^^^^^^^^^
+> 232 |                                 setLocalFilters({
+      | ^^^^^^^^^^^^^^^^^^^
+> 233 |                                     ...localFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 234 |                                     max_price:
+      | ^^^^^^^^^^^^^^^^^^^
+> 235 |                                         Number(e.target.value) || undefined,
+      | ^^^^^^^^^^^^^^^^^^^
+> 236 |                                 })
+      | ^^^^^^^^^^^^^^^^^^^
+> 237 |                             }
+      | ^^^^^^^^^^^^^^^^^^^
+> 238 |                             onBlur={() =>
+      | ^^^^^^^^^^^^^^^^^^^
+> 239 |                                 applyFilters({
+      | ^^^^^^^^^^^^^^^^^^^
+> 240 |                                     max_price: localFilters.max_price,
+      | ^^^^^^^^^^^^^^^^^^^
+> 241 |                                 })
+      | ^^^^^^^^^^^^^^^^^^^
+> 242 |                             }
+      | ^^^^^^^^^^^^^^^^^^^
+> 243 |                         />
+      | ^^^^^^^^^^^^^^^^^^^
+> 244 |                     </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 245 |                 </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 246 |             </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 247 |
+      | ^^^^^^^^^^^^^^^^^^^
+> 248 |             {/* Clear Filters */}
+      | ^^^^^^^^^^^^^^^^^^^
+> 249 |             {hasActiveFilters && (
+      | ^^^^^^^^^^^^^^^^^^^
+> 250 |                 <Button
+      | ^^^^^^^^^^^^^^^^^^^
+> 251 |                     variant="outline"
+      | ^^^^^^^^^^^^^^^^^^^
+> 252 |                     className="w-full"
+      | ^^^^^^^^^^^^^^^^^^^
+> 253 |                     onClick={clearFilters}
+      | ^^^^^^^^^^^^^^^^^^^
+> 254 |                 >
+      | ^^^^^^^^^^^^^^^^^^^
+> 255 |                     <X className="mr-2 h-4 w-4" />
+      | ^^^^^^^^^^^^^^^^^^^
+> 256 |                     Hapus Filter
+      | ^^^^^^^^^^^^^^^^^^^
+> 257 |                 </Button>
+      | ^^^^^^^^^^^^^^^^^^^
+> 258 |             )}
+      | ^^^^^^^^^^^^^^^^^^^
+> 259 |         </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 260 |     );
+      | ^^^^^^ The component is created during render here
+  261 |
+  262 |     return (
+  263 |         <StorefrontLayout title="Semua Produk" categories={categories}>                                                                                                react-hooks/static-components
+  353:46  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\laragon\www\e-commerce\resources\js\pages\storefront\products\index.tsx:353:46
+  351 |                                         </SheetHeader>
+  352 |                                         <div className="mt-6">
+> 353 |                                             <FilterSidebar
+      |                                              ^^^^^^^^^^^^^ This component is created during render
+  354 |                                                 categories={categories}
+  355 |                                                 filters={filters}
+  356 |                                                 localFilters={localFilters}
+
+C:\laragon\www\e-commerce\resources\js\pages\storefront\products\index.tsx:131:27
+  129 |         filters.max_price;
+  130 |
+> 131 |     const FilterSidebar = ({
+      |                           ^^
+> 132 |         categories,
+      | ^^^^^^^^^^^^^^^^^^^
+> 133 |         filters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 134 |         localFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 135 |         setLocalFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 136 |         applyFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 137 |         clearFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 138 |         hasActiveFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 139 |     }: {
+      | ^^^^^^^^^^^^^^^^^^^
+> 140 |         categories: CategoryWithCount[];
+      | ^^^^^^^^^^^^^^^^^^^
+> 141 |         filters: ProductFilters;
+      | ^^^^^^^^^^^^^^^^^^^
+> 142 |         localFilters: ProductFilters;
+      | ^^^^^^^^^^^^^^^^^^^
+> 143 |         setLocalFilters: (filters: ProductFilters) => void;
+      | ^^^^^^^^^^^^^^^^^^^
+> 144 |         applyFilters: (newFilters: Partial<ProductFilters>) => void;
+      | ^^^^^^^^^^^^^^^^^^^
+> 145 |         clearFilters: () => void;
+      | ^^^^^^^^^^^^^^^^^^^
+> 146 |         hasActiveFilters?: string | number | boolean;
+      | ^^^^^^^^^^^^^^^^^^^
+> 147 |     }) => (
+      | ^^^^^^^^^^^^^^^^^^^
+> 148 |         <div className="space-y-6">
+      | ^^^^^^^^^^^^^^^^^^^
+> 149 |             {/* Categories */}
+      | ^^^^^^^^^^^^^^^^^^^
+> 150 |             <div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 151 |                 <Label className="mb-3 block text-sm font-semibold">
+      | ^^^^^^^^^^^^^^^^^^^
+> 152 |                     Kategori
+      | ^^^^^^^^^^^^^^^^^^^
+> 153 |                 </Label>
+      | ^^^^^^^^^^^^^^^^^^^
+> 154 |                 <div className="space-y-2">
+      | ^^^^^^^^^^^^^^^^^^^
+> 155 |                     <button
+      | ^^^^^^^^^^^^^^^^^^^
+> 156 |                         onClick={() => applyFilters({ category: undefined })}
+      | ^^^^^^^^^^^^^^^^^^^
+> 157 |                         className={cn(
+      | ^^^^^^^^^^^^^^^^^^^
+> 158 |                             'w-full rounded-lg px-3 py-2 text-left text-sm transition-colors',
+      | ^^^^^^^^^^^^^^^^^^^
+> 159 |                             !filters.category
+      | ^^^^^^^^^^^^^^^^^^^
+> 160 |                                 ? 'bg-primary text-primary-foreground'
+      | ^^^^^^^^^^^^^^^^^^^
+> 161 |                                 : 'hover:bg-muted',
+      | ^^^^^^^^^^^^^^^^^^^
+> 162 |                         )}
+      | ^^^^^^^^^^^^^^^^^^^
+> 163 |                     >
+      | ^^^^^^^^^^^^^^^^^^^
+> 164 |                         Semua Kategori
+      | ^^^^^^^^^^^^^^^^^^^
+> 165 |                     </button>
+      | ^^^^^^^^^^^^^^^^^^^
+> 166 |                     {categories.map((category) => (
+      | ^^^^^^^^^^^^^^^^^^^
+> 167 |                         <button
+      | ^^^^^^^^^^^^^^^^^^^
+> 168 |                             key={category.id}
+      | ^^^^^^^^^^^^^^^^^^^
+> 169 |                             onClick={() =>
+      | ^^^^^^^^^^^^^^^^^^^
+> 170 |                                 applyFilters({ category: category.slug })
+      | ^^^^^^^^^^^^^^^^^^^
+> 171 |                             }
+      | ^^^^^^^^^^^^^^^^^^^
+> 172 |                             className={cn(
+      | ^^^^^^^^^^^^^^^^^^^
+> 173 |                                 'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors',
+      | ^^^^^^^^^^^^^^^^^^^
+> 174 |                                 filters.category === category.slug
+      | ^^^^^^^^^^^^^^^^^^^
+> 175 |                                     ? 'bg-primary text-primary-foreground'
+      | ^^^^^^^^^^^^^^^^^^^
+> 176 |                                     : 'hover:bg-muted',
+      | ^^^^^^^^^^^^^^^^^^^
+> 177 |                             )}
+      | ^^^^^^^^^^^^^^^^^^^
+> 178 |                         >
+      | ^^^^^^^^^^^^^^^^^^^
+> 179 |                             <span>{category.name}</span>
+      | ^^^^^^^^^^^^^^^^^^^
+> 180 |                             <span
+      | ^^^^^^^^^^^^^^^^^^^
+> 181 |                                 className={cn(
+      | ^^^^^^^^^^^^^^^^^^^
+> 182 |                                     'text-xs',
+      | ^^^^^^^^^^^^^^^^^^^
+> 183 |                                     filters.category === category.slug
+      | ^^^^^^^^^^^^^^^^^^^
+> 184 |                                         ? 'text-primary-foreground/70'
+      | ^^^^^^^^^^^^^^^^^^^
+> 185 |                                         : 'text-muted-foreground',
+      | ^^^^^^^^^^^^^^^^^^^
+> 186 |                                 )}
+      | ^^^^^^^^^^^^^^^^^^^
+> 187 |                             >
+      | ^^^^^^^^^^^^^^^^^^^
+> 188 |                                 {category.products_count}
+      | ^^^^^^^^^^^^^^^^^^^
+> 189 |                             </span>
+      | ^^^^^^^^^^^^^^^^^^^
+> 190 |                         </button>
+      | ^^^^^^^^^^^^^^^^^^^
+> 191 |                     ))}
+      | ^^^^^^^^^^^^^^^^^^^
+> 192 |                 </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 193 |             </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 194 |
+      | ^^^^^^^^^^^^^^^^^^^
+> 195 |             {/* Price Range */}
+      | ^^^^^^^^^^^^^^^^^^^
+> 196 |             <div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 197 |                 <Label className="mb-3 block text-sm font-semibold">
+      | ^^^^^^^^^^^^^^^^^^^
+> 198 |                     Rentang Harga
+      | ^^^^^^^^^^^^^^^^^^^
+> 199 |                 </Label>
+      | ^^^^^^^^^^^^^^^^^^^
+> 200 |                 <div className="grid grid-cols-2 gap-2">
+      | ^^^^^^^^^^^^^^^^^^^
+> 201 |                     <div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 202 |                         <Label className="mb-1 text-xs text-muted-foreground">
+      | ^^^^^^^^^^^^^^^^^^^
+> 203 |                             Min
+      | ^^^^^^^^^^^^^^^^^^^
+> 204 |                         </Label>
+      | ^^^^^^^^^^^^^^^^^^^
+> 205 |                         <Input
+      | ^^^^^^^^^^^^^^^^^^^
+> 206 |                             type="number"
+      | ^^^^^^^^^^^^^^^^^^^
+> 207 |                             placeholder="0"
+      | ^^^^^^^^^^^^^^^^^^^
+> 208 |                             value={localFilters.min_price || ''}
+      | ^^^^^^^^^^^^^^^^^^^
+> 209 |                             onChange={(e) =>
+      | ^^^^^^^^^^^^^^^^^^^
+> 210 |                                 setLocalFilters({
+      | ^^^^^^^^^^^^^^^^^^^
+> 211 |                                     ...localFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 212 |                                     min_price:
+      | ^^^^^^^^^^^^^^^^^^^
+> 213 |                                         Number(e.target.value) || undefined,
+      | ^^^^^^^^^^^^^^^^^^^
+> 214 |                                 })
+      | ^^^^^^^^^^^^^^^^^^^
+> 215 |                             }
+      | ^^^^^^^^^^^^^^^^^^^
+> 216 |                             onBlur={() =>
+      | ^^^^^^^^^^^^^^^^^^^
+> 217 |                                 applyFilters({
+      | ^^^^^^^^^^^^^^^^^^^
+> 218 |                                     min_price: localFilters.min_price,
+      | ^^^^^^^^^^^^^^^^^^^
+> 219 |                                 })
+      | ^^^^^^^^^^^^^^^^^^^
+> 220 |                             }
+      | ^^^^^^^^^^^^^^^^^^^
+> 221 |                         />
+      | ^^^^^^^^^^^^^^^^^^^
+> 222 |                     </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 223 |                     <div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 224 |                         <Label className="mb-1 text-xs text-muted-foreground">
+      | ^^^^^^^^^^^^^^^^^^^
+> 225 |                             Max
+      | ^^^^^^^^^^^^^^^^^^^
+> 226 |                         </Label>
+      | ^^^^^^^^^^^^^^^^^^^
+> 227 |                         <Input
+      | ^^^^^^^^^^^^^^^^^^^
+> 228 |                             type="number"
+      | ^^^^^^^^^^^^^^^^^^^
+> 229 |                             placeholder="1000000"
+      | ^^^^^^^^^^^^^^^^^^^
+> 230 |                             value={localFilters.max_price || ''}
+      | ^^^^^^^^^^^^^^^^^^^
+> 231 |                             onChange={(e) =>
+      | ^^^^^^^^^^^^^^^^^^^
+> 232 |                                 setLocalFilters({
+      | ^^^^^^^^^^^^^^^^^^^
+> 233 |                                     ...localFilters,
+      | ^^^^^^^^^^^^^^^^^^^
+> 234 |                                     max_price:
+      | ^^^^^^^^^^^^^^^^^^^
+> 235 |                                         Number(e.target.value) || undefined,
+      | ^^^^^^^^^^^^^^^^^^^
+> 236 |                                 })
+      | ^^^^^^^^^^^^^^^^^^^
+> 237 |                             }
+      | ^^^^^^^^^^^^^^^^^^^
+> 238 |                             onBlur={() =>
+      | ^^^^^^^^^^^^^^^^^^^
+> 239 |                                 applyFilters({
+      | ^^^^^^^^^^^^^^^^^^^
+> 240 |                                     max_price: localFilters.max_price,
+      | ^^^^^^^^^^^^^^^^^^^
+> 241 |                                 })
+      | ^^^^^^^^^^^^^^^^^^^
+> 242 |                             }
+      | ^^^^^^^^^^^^^^^^^^^
+> 243 |                         />
+      | ^^^^^^^^^^^^^^^^^^^
+> 244 |                     </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 245 |                 </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 246 |             </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 247 |
+      | ^^^^^^^^^^^^^^^^^^^
+> 248 |             {/* Clear Filters */}
+      | ^^^^^^^^^^^^^^^^^^^
+> 249 |             {hasActiveFilters && (
+      | ^^^^^^^^^^^^^^^^^^^
+> 250 |                 <Button
+      | ^^^^^^^^^^^^^^^^^^^
+> 251 |                     variant="outline"
+      | ^^^^^^^^^^^^^^^^^^^
+> 252 |                     className="w-full"
+      | ^^^^^^^^^^^^^^^^^^^
+> 253 |                     onClick={clearFilters}
+      | ^^^^^^^^^^^^^^^^^^^
+> 254 |                 >
+      | ^^^^^^^^^^^^^^^^^^^
+> 255 |                     <X className="mr-2 h-4 w-4" />
+      | ^^^^^^^^^^^^^^^^^^^
+> 256 |                     Hapus Filter
+      | ^^^^^^^^^^^^^^^^^^^
+> 257 |                 </Button>
+      | ^^^^^^^^^^^^^^^^^^^
+> 258 |             )}
+      | ^^^^^^^^^^^^^^^^^^^
+> 259 |         </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 260 |     );
+      | ^^^^^^ The component is created during render here
+  261 |
+  262 |     return (
+  263 |         <StorefrontLayout title="Semua Produk" categories={categories}>  react-hooks/static-components
+
+✖ 2 problems (2 errors, 0 warnings)
+
