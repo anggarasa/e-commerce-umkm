@@ -49,7 +49,7 @@ export default function CartIndex({ cart }: CartIndexProps) {
 
         const message = `Halo, saya ingin memesan:\n\n${orderLines.join('\n\n')}\n\n*Total: ${formatCurrency(cart.total_price)}*\n\nMohon konfirmasi ketersediaan dan informasi pembayaran. Terima kasih!`;
 
-        const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/6281224242608?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
     };
 

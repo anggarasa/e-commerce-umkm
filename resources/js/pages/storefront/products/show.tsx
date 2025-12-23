@@ -55,7 +55,7 @@ export default function ProductShow({
 
     const handleWhatsApp = () => {
         const message = `Halo, saya tertarik dengan produk:\n\n*${product.name}*\nHarga: ${formatCurrency(product.price)}\nJumlah: ${quantity}\n\nMohon informasi lebih lanjut.`;
-        const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/6281224242608?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
     };
 
