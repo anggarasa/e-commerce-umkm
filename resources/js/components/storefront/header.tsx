@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { Menu, Moon, Search, Sun, X } from 'lucide-react';
 
 import AppLogo from '@/components/branding/app-logo';
+import { CartIcon } from '@/components/storefront/cart-icon';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -26,7 +27,8 @@ interface StorefrontHeaderProps {
 }
 
 export function StorefrontHeader({ categories = [] }: StorefrontHeaderProps) {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, cartCount } = usePage<SharedData & { cartCount: number }>()
+        .props;
     const [isDark, setIsDark] = useState(() => {
         if (typeof window !== 'undefined') {
             return document.documentElement.classList.contains('dark');
@@ -160,6 +162,9 @@ export function StorefrontHeader({ categories = [] }: StorefrontHeaderProps) {
                             <Search className="h-5 w-5" />
                         </Button>
                     )}
+
+                    {/* Cart */}
+                    <CartIcon count={cartCount} />
 
                     {/* Theme toggle */}
                     <Button variant="ghost" size="icon" onClick={toggleTheme}>

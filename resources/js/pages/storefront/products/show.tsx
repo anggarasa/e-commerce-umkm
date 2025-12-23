@@ -1,18 +1,23 @@
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import {
     ArrowLeft,
     ChevronLeft,
     ChevronRight,
     ImageOff,
+    MessageCircle,
+    Minus,
     Package,
-    ShoppingBag,
+    Plus,
+    ShoppingCart,
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { add as addToCart } from '@/actions/App/Http/Controllers/CartController';
 import { ProductCard } from '@/components/storefront/product-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import StorefrontLayout from '@/layouts/storefront-layout';
 import { cn, formatCurrency } from '@/lib/utils';
 import { show as showCategory } from '@/routes/categories';
@@ -38,6 +43,21 @@ export default function ProductShow({
     const allMedia = product.media.length > 0 ? product.media : [];
     const currentMedia = allMedia[selectedMediaIndex] || primaryMedia;
     const isOutOfStock = product.stock <= 0;
+    const [quantity, setQuantity] = useState(1);
+
+    const handleAddToCart = () => {
+        router.post(
+            addToCart(),
+            { product_id: product.id, quantity },
+            { preserveScroll: true },
+        );
+    };
+
+    const handleWhatsApp = () => {
+        const message = `Halo, saya tertarik dengan produk:\n\n*${product.name}*\nHarga: ${formatCurrency(product.price)}\nJumlah: ${quantity}\n\nMohon informasi lebih lanjut.`;
+        const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    };
 
     const nextMedia = () => {
         if (allMedia.length > 1) {
@@ -241,31 +261,96 @@ export default function ProductShow({
                         )}
 
                         {/* CTA */}
-                        <div className="flex flex-col gap-3 sm:flex-row">
-                            <Button
-                                size="lg"
-                                className="flex-1 gap-2"
-                                disabled={isOutOfStock}
-                                onClick={() => {
-                                    // TODO: Add to cart or WhatsApp integration
-                                    const message = `Halo, saya tertarik dengan produk:\n\n*${product.name}*\nHarga: ${formatCurrency(product.price)}\n\nMohon informasi lebih lanjut.`;
-                                    const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
-                                    window.open(whatsappUrl, '_blank');
-                                }}
-                            >
-                                <ShoppingBag className="h-5 w-5" />
-                                {isOutOfStock
-                                    ? 'Stok Habis'
-                                    : 'Pesan via WhatsApp'}
-                            </Button>
+                        <div className="space-y-4">
+                            {/* Quantity Selector */}
+                            {!isOutOfStock && (
+                                <div className="flex items-center gap-3">
+                                    <span className="text-sm font-medium">
+                                        Jumlah:
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-9 w-9"
+                                            onClick={() =>
+                                                setQuantity((q) =>
+                                                    Math.max(1, q - 1),
+                                                )
+                                            }
+                                            disabled={quantity <= 1}
+                                        >
+                                            <Minus className="h-4 w-4" />
+                                        </Button>
+                                        <Input
+                                            type="number"
+                                            min={1}
+                                            max={product.stock}
+                                            value={quantity}
+                                            onChange={(e) => {
+                                                const val =
+                                                    parseInt(e.target.value) ||
+                                                    1;
+                                                setQuantity(
+                                                    Math.min(
+                                                        Math.max(1, val),
+                                                        product.stock,
+                                                    ),
+                                                );
+                                            }}
+                                            className="h-9 w-20 text-center"
+                                        />
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-9 w-9"
+                                            onClick={() =>
+                                                setQuantity((q) =>
+                                                    Math.min(
+                                                        product.stock,
+                                                        q + 1,
+                                                    ),
+                                                )
+                                            }
+                                            disabled={quantity >= product.stock}
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col gap-3 sm:flex-row">
+                                <Button
+                                    size="lg"
+                                    className="flex-1 gap-2"
+                                    disabled={isOutOfStock}
+                                    onClick={handleAddToCart}
+                                >
+                                    <ShoppingCart className="h-5 w-5" />
+                                    {isOutOfStock
+                                        ? 'Stok Habis'
+                                        : 'Tambah ke Keranjang'}
+                                </Button>
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    className="gap-2"
+                                    disabled={isOutOfStock}
+                                    onClick={handleWhatsApp}
+                                >
+                                    <MessageCircle className="h-5 w-5" />
+                                    WhatsApp
+                                </Button>
+                            </div>
                         </div>
 
                         {/* Additional Info */}
                         <div className="rounded-lg border p-4 text-sm text-muted-foreground">
                             <p>
-                                💬 Klik tombol di atas untuk langsung terhubung
-                                dengan kami via WhatsApp dan melakukan
-                                pemesanan.
+                                🛒 Tambahkan produk ke keranjang atau langsung
+                                hubungi kami via WhatsApp untuk pemesanan.
                             </p>
                         </div>
                     </div>

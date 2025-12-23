@@ -102,3 +102,26 @@ export interface ProductFilters {
 export interface CategoryWithCount extends Category {
     products_count: number;
 }
+
+export interface CartItem {
+    id: string;
+    cart_id: string;
+    product_id: string;
+    quantity: number;
+    price: number;
+    subtotal: number;
+    product: Product;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Cart {
+    id: string;
+    user_id: string | null;
+    session_id: string | null;
+    items: CartItem[];
+    total_items: number;
+    total_price: number;
+    created_at: string;
+    updated_at: string;
+}

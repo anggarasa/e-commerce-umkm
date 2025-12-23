@@ -1,0 +1,169 @@
+import { Link, router } from '@inertiajs/react';
+import { ArrowLeft, ShoppingBag, Trash2 } from 'lucide-react';
+
+import { CartItemCard } from '@/components/storefront/cart-item-card';
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import StorefrontLayout from '@/layouts/storefront-layout';
+import { formatCurrency } from '@/lib/utils';
+import { clear as clearCart } from '@/routes/cart';
+import { index as productsIndex } from '@/routes/products';
+import { type Cart } from '@/types';
+
+interface CartIndexProps {
+    cart: Cart;
+}
+
+export default function CartIndex({ cart }: CartIndexProps) {
+    const handleClearCart = () => {
+        if (confirm('Apakah Anda yakin ingin mengosongkan keranjang?')) {
+            router.delete(clearCart(), {
+                preserveScroll: true,
+            });
+        }
+    };
+
+    const handleCheckout = () => {
+        if (cart.items.length === 0) return;
+
+        // Format order details for WhatsApp
+        const orderLines = cart.items.map(
+            (item) =>
+                `• ${item.product.name}\n  Qty: ${item.quantity} x ${formatCurrency(item.price)} = ${formatCurrency(item.subtotal)}`,
+        );
+
+        const message = `Halo, saya ingin memesan:\n\n${orderLines.join('\n\n')}\n\n*Total: ${formatCurrency(cart.total_price)}*\n\nMohon konfirmasi ketersediaan dan informasi pembayaran. Terima kasih!`;
+
+        const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    };
+
+    const isEmpty = cart.items.length === 0;
+
+    return (
+        <StorefrontLayout title="Keranjang Belanja">
+            <div className="container mx-auto px-4 py-8">
+                {/* Header */}
+                <div className="mb-6 flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold">
+                            Keranjang Belanja
+                        </h1>
+                        <p className="mt-1 text-muted-foreground">
+                            {cart.total_items} item dalam keranjang
+                        </p>
+                    </div>
+                    {!isEmpty && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleClearCart}
+                            className="gap-2 text-destructive hover:text-destructive"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                            Kosongkan
+                        </Button>
+                    )}
+                </div>
+
+                {isEmpty ? (
+                    /* Empty State */
+                    <Card className="py-16 text-center">
+                        <CardContent className="flex flex-col items-center gap-4">
+                            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+                                <ShoppingBag className="h-10 w-10 text-muted-foreground" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-semibold">
+                                    Keranjang Kosong
+                                </h2>
+                                <p className="mt-1 text-muted-foreground">
+                                    Belum ada produk di keranjang belanja Anda
+                                </p>
+                            </div>
+                            <Link href={productsIndex()}>
+                                <Button className="mt-4 gap-2">
+                                    <ArrowLeft className="h-4 w-4" />
+                                    Mulai Belanja
+                                </Button>
+                            </Link>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    /* Cart Content */
+                    <div className="grid gap-8 lg:grid-cols-3">
+                        {/* Cart Items */}
+                        <div className="space-y-4 lg:col-span-2">
+                            {cart.items.map((item) => (
+                                <CartItemCard key={item.id} item={item} />
+                            ))}
+                        </div>
+
+                        {/* Order Summary */}
+                        <div className="lg:col-span-1">
+                            <Card className="sticky top-24">
+                                <CardHeader>
+                                    <CardTitle>Ringkasan Pesanan</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground">
+                                            Subtotal ({cart.total_items} item)
+                                        </span>
+                                        <span>
+                                            {formatCurrency(cart.total_price)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground">
+                                            Ongkos Kirim
+                                        </span>
+                                        <span className="text-green-600">
+                                            Dihitung saat checkout
+                                        </span>
+                                    </div>
+                                    <Separator />
+                                    <div className="flex justify-between text-lg font-semibold">
+                                        <span>Total</span>
+                                        <span className="text-primary">
+                                            {formatCurrency(cart.total_price)}
+                                        </span>
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="flex flex-col gap-3">
+                                    <Button
+                                        className="w-full gap-2"
+                                        size="lg"
+                                        onClick={handleCheckout}
+                                    >
+                                        <ShoppingBag className="h-5 w-5" />
+                                        Checkout via WhatsApp
+                                    </Button>
+                                    <Link
+                                        href={productsIndex()}
+                                        className="w-full"
+                                    >
+                                        <Button
+                                            variant="outline"
+                                            className="w-full gap-2"
+                                        >
+                                            <ArrowLeft className="h-4 w-4" />
+                                            Lanjut Belanja
+                                        </Button>
+                                    </Link>
+                                </CardFooter>
+                            </Card>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </StorefrontLayout>
+    );
+}
