@@ -369,7 +369,7 @@ export default function ProductsIndex({
                                                 Filter Produk
                                             </SheetTitle>
                                         </SheetHeader>
-                                        <div className="mt-6">
+                                        <div className="mt-6 flex-1 overflow-y-auto px-4">
                                             <FilterSidebar
                                                 categories={categories}
                                                 filters={filters}
