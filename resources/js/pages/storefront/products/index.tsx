@@ -79,140 +79,201 @@ const FilterSidebar = ({
     applyFilters: (newFilters: Partial<ProductFilters>) => void;
     clearFilters: () => void;
     hasActiveFilters?: string | number | boolean;
-}) => (
-    <div className="space-y-6">
-        {/* Categories */}
-        <div>
-            <Label className="mb-3 block text-sm font-semibold">Kategori</Label>
-            <div className="space-y-2">
-                <button
-                    onClick={() => applyFilters({ category: undefined })}
-                    className={cn(
-                        'w-full rounded-lg px-3 py-2 text-left text-sm transition-colors',
-                        !filters.category
-                            ? 'bg-primary text-primary-foreground'
-                            : 'hover:bg-muted',
-                    )}
-                >
-                    Semua Kategori
-                </button>
-                {categories.map((category) => (
-                    <div key={category.id}>
-                        <button
-                            onClick={() =>
-                                applyFilters({ category: category.slug })
-                            }
-                            className={cn(
-                                'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors',
-                                filters.category === category.slug
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'hover:bg-muted',
-                            )}
-                        >
-                            <span>{category.name}</span>
-                            <span
-                                className={cn(
-                                    'text-xs',
-                                    filters.category === category.slug
-                                        ? 'text-primary-foreground/70'
-                                        : 'text-muted-foreground',
-                                )}
-                            >
-                                {category.products_count}
-                            </span>
-                        </button>
-                        {/* Child Categories */}
-                        {category.children && category.children.length > 0 && (
-                            <div className="mt-1 ml-3 space-y-1 border-l pl-2">
-                                {category.children.map((child) => (
+}) => {
+    const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+
+    const toggleCategory = (categoryId: string) => {
+        setExpandedCategories((prev) =>
+            prev.includes(categoryId)
+                ? prev.filter((id) => id !== categoryId)
+                : [...prev, categoryId],
+        );
+    };
+
+    const isCategoryExpanded = (categoryId: string) =>
+        expandedCategories.includes(categoryId);
+
+    return (
+        <div className="space-y-6">
+            {/* Categories */}
+            <div>
+                <Label className="mb-3 block text-sm font-semibold">
+                    Kategori
+                </Label>
+                <div className="space-y-2">
+                    <button
+                        onClick={() => applyFilters({ category: undefined })}
+                        className={cn(
+                            'w-full rounded-lg px-3 py-2 text-left text-sm transition-colors',
+                            !filters.category
+                                ? 'bg-primary text-primary-foreground'
+                                : 'hover:bg-muted',
+                        )}
+                    >
+                        Semua Kategori
+                    </button>
+                    {categories.map((category) => {
+                        const hasChildren =
+                            category.children && category.children.length > 0;
+                        const isExpanded = isCategoryExpanded(category.id);
+
+                        return (
+                            <div key={category.id}>
+                                <div className="flex items-center gap-1">
+                                    {/* Expand/Collapse Toggle */}
+                                    {hasChildren && (
+                                        <button
+                                            onClick={() =>
+                                                toggleCategory(category.id)
+                                            }
+                                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                            aria-label={
+                                                isExpanded
+                                                    ? 'Tutup sub-kategori'
+                                                    : 'Buka sub-kategori'
+                                            }
+                                        >
+                                            <ChevronRight
+                                                className={cn(
+                                                    'h-4 w-4 transition-transform duration-200',
+                                                    isExpanded && 'rotate-90',
+                                                )}
+                                            />
+                                        </button>
+                                    )}
+                                    {/* Category Button */}
                                     <button
-                                        key={child.id}
                                         onClick={() =>
                                             applyFilters({
-                                                category: child.slug,
+                                                category: category.slug,
                                             })
                                         }
                                         className={cn(
-                                            'flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-left text-sm transition-colors',
-                                            filters.category === child.slug
-                                                ? 'bg-primary/10 font-medium text-primary'
-                                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                                            'flex flex-1 items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors',
+                                            filters.category === category.slug
+                                                ? 'bg-primary text-primary-foreground'
+                                                : 'hover:bg-muted',
+                                            !hasChildren && 'ml-9',
                                         )}
                                     >
-                                        <span>{child.name}</span>
-                                        <span className="text-xs opacity-70">
-                                            {(child as CategoryWithCount)
-                                                .products_count || 0}
+                                        <span>{category.name}</span>
+                                        <span
+                                            className={cn(
+                                                'text-xs',
+                                                filters.category ===
+                                                    category.slug
+                                                    ? 'text-primary-foreground/70'
+                                                    : 'text-muted-foreground',
+                                            )}
+                                        >
+                                            {category.products_count}
                                         </span>
                                     </button>
-                                ))}
+                                </div>
+                                {/* Child Categories */}
+                                {hasChildren && isExpanded && (
+                                    <div className="mt-1 ml-9 space-y-1 border-l pl-2">
+                                        {category.children!.map((child) => (
+                                            <button
+                                                key={child.id}
+                                                onClick={() =>
+                                                    applyFilters({
+                                                        category: child.slug,
+                                                    })
+                                                }
+                                                className={cn(
+                                                    'flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-left text-sm transition-colors',
+                                                    filters.category ===
+                                                        child.slug
+                                                        ? 'bg-primary/10 font-medium text-primary'
+                                                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                                                )}
+                                            >
+                                                <span>{child.name}</span>
+                                                <span className="text-xs opacity-70">
+                                                    {
+                                                        (
+                                                            child as CategoryWithCount
+                                                        ).products_count
+                                                    }
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Price Range */}
+            <div>
+                <Label className="mb-3 block text-sm font-semibold">
+                    Rentang Harga
+                </Label>
+                <div className="grid grid-cols-2 gap-2">
+                    <div>
+                        <Label className="mb-1 text-xs text-muted-foreground">
+                            Min
+                        </Label>
+                        <Input
+                            type="number"
+                            placeholder="0"
+                            value={localFilters.min_price || ''}
+                            onChange={(e) =>
+                                setLocalFilters({
+                                    ...localFilters,
+                                    min_price:
+                                        Number(e.target.value) || undefined,
+                                })
+                            }
+                            onBlur={() =>
+                                applyFilters({
+                                    min_price: localFilters.min_price,
+                                })
+                            }
+                        />
                     </div>
-                ))}
-            </div>
-        </div>
-
-        {/* Price Range */}
-        <div>
-            <Label className="mb-3 block text-sm font-semibold">
-                Rentang Harga
-            </Label>
-            <div className="grid grid-cols-2 gap-2">
-                <div>
-                    <Label className="mb-1 text-xs text-muted-foreground">
-                        Min
-                    </Label>
-                    <Input
-                        type="number"
-                        placeholder="0"
-                        value={localFilters.min_price || ''}
-                        onChange={(e) =>
-                            setLocalFilters({
-                                ...localFilters,
-                                min_price: Number(e.target.value) || undefined,
-                            })
-                        }
-                        onBlur={() =>
-                            applyFilters({
-                                min_price: localFilters.min_price,
-                            })
-                        }
-                    />
-                </div>
-                <div>
-                    <Label className="mb-1 text-xs text-muted-foreground">
-                        Max
-                    </Label>
-                    <Input
-                        type="number"
-                        placeholder="1000000"
-                        value={localFilters.max_price || ''}
-                        onChange={(e) =>
-                            setLocalFilters({
-                                ...localFilters,
-                                max_price: Number(e.target.value) || undefined,
-                            })
-                        }
-                        onBlur={() =>
-                            applyFilters({
-                                max_price: localFilters.max_price,
-                            })
-                        }
-                    />
+                    <div>
+                        <Label className="mb-1 text-xs text-muted-foreground">
+                            Max
+                        </Label>
+                        <Input
+                            type="number"
+                            placeholder="1000000"
+                            value={localFilters.max_price || ''}
+                            onChange={(e) =>
+                                setLocalFilters({
+                                    ...localFilters,
+                                    max_price:
+                                        Number(e.target.value) || undefined,
+                                })
+                            }
+                            onBlur={() =>
+                                applyFilters({
+                                    max_price: localFilters.max_price,
+                                })
+                            }
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        {/* Clear Filters */}
-        {hasActiveFilters && (
-            <Button variant="outline" className="w-full" onClick={clearFilters}>
-                <X className="mr-2 h-4 w-4" />
-                Hapus Filter
-            </Button>
-        )}
-    </div>
-);
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+                <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={clearFilters}
+                >
+                    <X className="mr-2 h-4 w-4" />
+                    Hapus Filter
+                </Button>
+            )}
+        </div>
+    );
+};
 
 export default function ProductsIndex({
     products,
