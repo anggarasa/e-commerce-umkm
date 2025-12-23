@@ -1,6 +1,8 @@
 import { Link } from '@inertiajs/react';
 import * as LucideIcons from 'lucide-react';
 
+import { Package } from 'lucide-react';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { show as showCategory } from '@/routes/categories';
@@ -12,13 +14,24 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category, className }: CategoryCardProps) {
-    // Get icon component dynamically
     // Get icon component dynamically - safely
-    const IconName = category.icon as keyof typeof LucideIcons;
+    const normalizeIconName = (name: string) => {
+        return name
+            .split(/[-_]+/)
+            .map(
+                (part) =>
+                    part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
+            )
+            .join('');
+    };
+
+    const iconName = category.icon ? normalizeIconName(category.icon) : '';
+    const icons = LucideIcons as unknown as Record<
+        string,
+        LucideIcons.LucideIcon
+    >;
     const IconComponent =
-        category.icon && LucideIcons[IconName]
-            ? (LucideIcons[IconName] as LucideIcons.LucideIcon)
-            : LucideIcons.Package;
+        category.icon && icons[iconName] ? icons[iconName] : Package;
 
     return (
         <Link

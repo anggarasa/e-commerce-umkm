@@ -30,12 +30,26 @@ export default function CategoryShow({
     category,
     products,
 }: CategoryShowProps) {
-    // Get icon component dynamically
-    const IconComponent = category.icon
-        ? (LucideIcons[
-              category.icon as keyof typeof LucideIcons
-          ] as LucideIcons.LucideIcon)
-        : Package;
+    // Get icon component dynamically - safely
+    // Helper to normalize icon name
+    const normalizeIconName = (name: string) => {
+        return name
+            .split(/[-_]+/)
+            .map(
+                (part) =>
+                    part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
+            )
+            .join('');
+    };
+
+    // Get icon component dynamically - safely
+    const iconName = category.icon ? normalizeIconName(category.icon) : '';
+    const icons = LucideIcons as unknown as Record<
+        string,
+        LucideIcons.LucideIcon
+    >;
+    const IconComponent =
+        category.icon && icons[iconName] ? icons[iconName] : Package;
 
     const goToPage = (page: number) => {
         router.get(
@@ -99,11 +113,17 @@ export default function CategoryShow({
                         </h2>
                         <div className="flex flex-wrap gap-2">
                             {category.children.map((child) => {
-                                const ChildIcon = child.icon
-                                    ? (LucideIcons[
-                                          child.icon as keyof typeof LucideIcons
-                                      ] as LucideIcons.LucideIcon)
-                                    : Package;
+                                const childIconName = child.icon
+                                    ? normalizeIconName(child.icon)
+                                    : '';
+                                const icons = LucideIcons as unknown as Record<
+                                    string,
+                                    LucideIcons.LucideIcon
+                                >;
+                                const ChildIcon =
+                                    child.icon && icons[childIconName]
+                                        ? icons[childIconName]
+                                        : Package;
 
                                 return (
                                     <Link
