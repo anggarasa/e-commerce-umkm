@@ -98,7 +98,7 @@ export default function ProductShow({
                                 currentMedia.type === 'video' ? (
                                     <video
                                         src={currentMedia.url}
-                                        className="h-full w-full object-cover"
+                                        className="h-full w-full bg-black object-contain"
                                         controls
                                         poster={
                                             currentMedia.thumbnail_url ||

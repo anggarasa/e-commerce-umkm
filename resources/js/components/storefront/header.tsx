@@ -1,5 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Menu, Moon, Search, ShoppingBag, Sun, X } from 'lucide-react';
+import { Menu, Moon, Search, Sun, X } from 'lucide-react';
+
+import AppLogo from '@/components/branding/app-logo';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -58,10 +60,7 @@ export function StorefrontHeader({ categories = [] }: StorefrontHeaderProps) {
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
                 {/* Logo */}
                 <Link href={home()} className="flex items-center gap-2">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                        <ShoppingBag className="h-5 w-5" />
-                    </div>
-                    <span className="text-xl font-bold">GarraCommerce</span>
+                    <AppLogo />
                 </Link>
 
                 {/* Desktop Navigation */}
