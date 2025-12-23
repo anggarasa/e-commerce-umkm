@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
-import { ImageOff, Minus, Plus, Trash2 } from 'lucide-react';
+import { ImageOff, Loader2, Minus, Plus, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,19 +17,73 @@ interface CartItemCardProps {
 }
 
 export function CartItemCard({ item }: CartItemCardProps) {
+    // Track the pending quantity (what user selected but not yet synced)
+    const [pendingQuantity, setPendingQuantity] = useState<number | null>(null);
+    const [isSyncing, setIsSyncing] = useState(false);
+    const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Display quantity: use pending if exists and syncing, otherwise use server value
+    const displayQuantity = pendingQuantity ?? item.quantity;
+
     const primaryMedia =
         item.product.media?.find((m) => m.is_primary) ||
         item.product.media?.[0];
+
+    // Debounced sync to server
+    const syncToServer = useCallback(
+        (newQuantity: number) => {
+            // Clear existing timer
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+
+            // Set syncing state
+            setIsSyncing(true);
+
+            // Debounce for 500ms
+            debounceTimerRef.current = setTimeout(() => {
+                router.patch(
+                    updateCartItem(item.id),
+                    { quantity: newQuantity },
+                    {
+                        preserveScroll: true,
+                        onSuccess: () => {
+                            // Clear pending since server now has the correct value
+                            setPendingQuantity(null);
+                            setIsSyncing(false);
+                        },
+                        onError: () => {
+                            // Clear pending to revert to server value
+                            setPendingQuantity(null);
+                            setIsSyncing(false);
+                        },
+                    },
+                );
+            }, 500);
+        },
+        [item.id],
+    );
+
+    // Cleanup timer on unmount
+    useEffect(() => {
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, []);
 
     const handleQuantityChange = (newQuantity: number) => {
         if (newQuantity < 1) return;
         if (newQuantity > item.product.stock) return;
 
-        router.patch(
-            updateCartItem(item.id),
-            { quantity: newQuantity },
-            { preserveScroll: true },
-        );
+        // Skip if same as current server value and no pending changes
+        if (newQuantity === item.quantity && pendingQuantity === null) return;
+
+        // Update pending state immediately (optimistic update)
+        setPendingQuantity(newQuantity);
+        // Schedule sync to server
+        syncToServer(newQuantity);
     };
 
     const handleRemove = () => {
@@ -39,7 +94,10 @@ export function CartItemCard({ item }: CartItemCardProps) {
 
     const isOutOfStock = item.product.stock <= 0;
     const isLowStock =
-        item.product.stock > 0 && item.product.stock < item.quantity;
+        item.product.stock > 0 && item.product.stock < displayQuantity;
+
+    // Calculate subtotal based on display quantity
+    const displaySubtotal = item.price * displayQuantity;
 
     return (
         <Card className="overflow-hidden">
@@ -94,9 +152,11 @@ export function CartItemCard({ item }: CartItemCardProps) {
                                     size="icon"
                                     className="h-8 w-8"
                                     onClick={() =>
-                                        handleQuantityChange(item.quantity - 1)
+                                        handleQuantityChange(
+                                            displayQuantity - 1,
+                                        )
                                     }
-                                    disabled={item.quantity <= 1}
+                                    disabled={displayQuantity <= 1}
                                 >
                                     <Minus className="h-4 w-4" />
                                 </Button>
@@ -104,7 +164,7 @@ export function CartItemCard({ item }: CartItemCardProps) {
                                     type="number"
                                     min={1}
                                     max={item.product.stock}
-                                    value={item.quantity}
+                                    value={displayQuantity}
                                     onChange={(e) =>
                                         handleQuantityChange(
                                             parseInt(e.target.value) || 1,
@@ -117,10 +177,12 @@ export function CartItemCard({ item }: CartItemCardProps) {
                                     size="icon"
                                     className="h-8 w-8"
                                     onClick={() =>
-                                        handleQuantityChange(item.quantity + 1)
+                                        handleQuantityChange(
+                                            displayQuantity + 1,
+                                        )
                                     }
                                     disabled={
-                                        item.quantity >= item.product.stock
+                                        displayQuantity >= item.product.stock
                                     }
                                 >
                                     <Plus className="h-4 w-4" />
@@ -129,9 +191,14 @@ export function CartItemCard({ item }: CartItemCardProps) {
 
                             {/* Subtotal & Remove */}
                             <div className="flex items-center gap-4">
-                                <span className="font-semibold text-primary">
-                                    {formatCurrency(item.subtotal)}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <span className="font-semibold text-primary">
+                                        {formatCurrency(displaySubtotal)}
+                                    </span>
+                                    {isSyncing && (
+                                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                                    )}
+                                </div>
                                 <Button
                                     variant="ghost"
                                     size="icon"

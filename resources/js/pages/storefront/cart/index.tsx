@@ -10,6 +10,10 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    ConfirmationDialog,
+    useConfirmationDialog,
+} from '@/components/ui/confirmation-dialog';
 import { Separator } from '@/components/ui/separator';
 import StorefrontLayout from '@/layouts/storefront-layout';
 import { formatCurrency } from '@/lib/utils';
@@ -22,12 +26,16 @@ interface CartIndexProps {
 }
 
 export default function CartIndex({ cart }: CartIndexProps) {
+    const clearCartDialog = useConfirmationDialog();
+
     const handleClearCart = () => {
-        if (confirm('Apakah Anda yakin ingin mengosongkan keranjang?')) {
+        return new Promise<void>((resolve, reject) => {
             router.delete(clearCart(), {
                 preserveScroll: true,
+                onSuccess: () => resolve(),
+                onError: () => reject(),
             });
-        }
+        });
     };
 
     const handleCheckout = () => {
@@ -64,7 +72,7 @@ export default function CartIndex({ cart }: CartIndexProps) {
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={handleClearCart}
+                            onClick={clearCartDialog.openDialog}
                             className="gap-2 text-destructive hover:text-destructive"
                         >
                             <Trash2 className="h-4 w-4" />
@@ -164,6 +172,19 @@ export default function CartIndex({ cart }: CartIndexProps) {
                     </div>
                 )}
             </div>
+
+            {/* Clear Cart Confirmation Dialog */}
+            <ConfirmationDialog
+                open={clearCartDialog.isOpen}
+                onOpenChange={clearCartDialog.setIsOpen}
+                variant="destructive"
+                title="Kosongkan Keranjang"
+                description="Apakah Anda yakin ingin mengosongkan keranjang? Semua produk di keranjang akan dihapus dan tidak dapat dikembalikan."
+                confirmText="Ya, Kosongkan"
+                cancelText="Batal"
+                processingText="Mengosongkan..."
+                onConfirm={handleClearCart}
+            />
         </StorefrontLayout>
     );
 }
