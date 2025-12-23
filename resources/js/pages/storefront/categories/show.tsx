@@ -71,6 +71,17 @@ export default function CategoryShow({
                         Produk
                     </Link>
                     <ChevronRight className="h-4 w-4" />
+                    {category.parent && (
+                        <>
+                            <Link
+                                href={showCategory(category.parent.slug)}
+                                className="hover:text-foreground"
+                            >
+                                {category.parent.name}
+                            </Link>
+                            <ChevronRight className="h-4 w-4" />
+                        </>
+                    )}
                     <span className="text-foreground">{category.name}</span>
                 </nav>
 

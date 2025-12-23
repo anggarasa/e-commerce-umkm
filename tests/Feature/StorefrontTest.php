@@ -209,7 +209,7 @@ describe('Category Page', function () {
         $response->assertInertia(fn ($page) => $page
             ->has('products.data')
             ->where('products.data', fn ($products) => collect($products)->every(fn ($p) => $p['category_id'] === $this->category->id
-                )
+            )
             )
         );
     });

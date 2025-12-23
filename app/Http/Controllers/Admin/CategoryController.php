@@ -55,9 +55,6 @@ class CategoryController extends Controller
             ->with('success', 'Kategori berhasil ditambahkan.');
     }
 
-
-
-
     /**
      * Show the form for editing the specified resource.
      */

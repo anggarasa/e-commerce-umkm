@@ -27,9 +27,15 @@ class StorefrontController extends Controller
             ->where('is_active', true)
             ->whereNull('parent_id')
             ->withCount(['products' => fn ($q) => $q->where('is_active', true)])
+            ->with(['children' => fn ($q) => $q->where('is_active', true)->withCount(['products' => fn ($q) => $q->where('is_active', true)])])
             ->orderBy('name')
             ->take(6)
             ->get();
+
+        // Calculate total products recursively (1 level deep)
+        $featuredCategories->each(function ($category) {
+            $category->products_count += $category->children->sum('products_count');
+        });
 
         return Inertia::render('welcome', [
             'featuredProducts' => $featuredProducts,
@@ -84,8 +90,14 @@ class StorefrontController extends Controller
             ->where('is_active', true)
             ->whereNull('parent_id')
             ->withCount(['products' => fn ($q) => $q->where('is_active', true)])
+            ->with(['children' => fn ($q) => $q->where('is_active', true)->withCount(['products' => fn ($q) => $q->where('is_active', true)])])
             ->orderBy('name')
             ->get();
+
+        // Calculate total products recursively (1 level deep) for sidebar
+        $categories->each(function ($category) {
+            $category->products_count += $category->children->sum('products_count');
+        });
 
         return Inertia::render('storefront/products/index', [
             'products' => $products,
@@ -135,7 +147,10 @@ class StorefrontController extends Controller
             abort(404);
         }
 
-        $category->load(['children' => fn ($q) => $q->where('is_active', true)]);
+        $category->load([
+            'children' => fn ($q) => $q->where('is_active', true)->withCount(['products' => fn ($q) => $q->where('is_active', true)]),
+            'parent',
+        ]);
 
         // Get products from this category and its children
         $categoryIds = collect([$category->id])

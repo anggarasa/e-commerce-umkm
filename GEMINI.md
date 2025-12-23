@@ -359,7 +359,7 @@ If your application uses the `<Form>` component from Inertia, you can use Wayfin
   it('returns all', function () {
   $response = $this->postJson('/api/docs', []);
 
-        $response->assertSuccessful();
+          $response->assertSuccessful();
 
     });
     </code-snippet>
@@ -452,6 +452,7 @@ import { Link } from '@inertiajs/react'
 import { Form } from '@inertiajs/react'
 
 export default () => (
+
 <Form action="/users" method="post">
 {({
 errors,
@@ -494,13 +495,13 @@ defaults
 
 - When listing items, use gap utilities for spacing, don't use margins.
 
-      <code-snippet name="Valid Flex Gap Spacing Example" lang="html">
-          <div class="flex gap-8">
-              <div>Superior</div>
-              <div>Michigan</div>
-              <div>Erie</div>
-          </div>
-      </code-snippet>
+        <code-snippet name="Valid Flex Gap Spacing Example" lang="html">
+            <div class="flex gap-8">
+                <div>Superior</div>
+                <div>Michigan</div>
+                <div>Erie</div>
+            </div>
+        </code-snippet>
 
 ### Dark Mode
 

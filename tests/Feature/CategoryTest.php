@@ -160,8 +160,6 @@ describe('Category Edit', function () {
     });
 });
 
-
-
 describe('Category Delete', function () {
     it('can delete a category', function () {
         $category = Category::factory()->create();

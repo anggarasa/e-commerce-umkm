@@ -97,30 +97,58 @@ const FilterSidebar = ({
                     Semua Kategori
                 </button>
                 {categories.map((category) => (
-                    <button
-                        key={category.id}
-                        onClick={() =>
-                            applyFilters({ category: category.slug })
-                        }
-                        className={cn(
-                            'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors',
-                            filters.category === category.slug
-                                ? 'bg-primary text-primary-foreground'
-                                : 'hover:bg-muted',
-                        )}
-                    >
-                        <span>{category.name}</span>
-                        <span
+                    <div key={category.id}>
+                        <button
+                            onClick={() =>
+                                applyFilters({ category: category.slug })
+                            }
                             className={cn(
-                                'text-xs',
+                                'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors',
                                 filters.category === category.slug
-                                    ? 'text-primary-foreground/70'
-                                    : 'text-muted-foreground',
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'hover:bg-muted',
                             )}
                         >
-                            {category.products_count}
-                        </span>
-                    </button>
+                            <span>{category.name}</span>
+                            <span
+                                className={cn(
+                                    'text-xs',
+                                    filters.category === category.slug
+                                        ? 'text-primary-foreground/70'
+                                        : 'text-muted-foreground',
+                                )}
+                            >
+                                {category.products_count}
+                            </span>
+                        </button>
+                        {/* Child Categories */}
+                        {category.children && category.children.length > 0 && (
+                            <div className="mt-1 ml-3 space-y-1 border-l pl-2">
+                                {category.children.map((child) => (
+                                    <button
+                                        key={child.id}
+                                        onClick={() =>
+                                            applyFilters({
+                                                category: child.slug,
+                                            })
+                                        }
+                                        className={cn(
+                                            'flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-left text-sm transition-colors',
+                                            filters.category === child.slug
+                                                ? 'bg-primary/10 font-medium text-primary'
+                                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                                        )}
+                                    >
+                                        <span>{child.name}</span>
+                                        <span className="text-xs opacity-70">
+                                            {(child as CategoryWithCount)
+                                                .products_count || 0}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 ))}
             </div>
         </div>
