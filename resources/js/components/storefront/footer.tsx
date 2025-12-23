@@ -5,10 +5,10 @@ import {
     Mail,
     MapPin,
     Phone,
-    ShoppingBag,
     Twitter,
 } from 'lucide-react';
 
+import AppLogo from '@/components/branding/app-logo';
 import { home } from '@/routes';
 import { index as productsIndex } from '@/routes/products';
 
@@ -22,12 +22,7 @@ export function StorefrontFooter() {
                     {/* Brand */}
                     <div className="space-y-4">
                         <Link href={home()} className="flex items-center gap-2">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                                <ShoppingBag className="h-5 w-5" />
-                            </div>
-                            <span className="text-xl font-bold">
-                                GarraCommerce
-                            </span>
+                            <AppLogo />
                         </Link>
                         <p className="text-sm text-muted-foreground">
                             Platform e-commerce terbaik untuk UMKM Indonesia.
