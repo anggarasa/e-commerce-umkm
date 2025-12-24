@@ -45,5 +45,25 @@ Route::get('/register', function () {
     return redirect()->route('home');
 });
 
+// Email preview route (development only)
+if (app()->environment('local')) {
+    Route::get('/mail-preview', function () {
+        $order = \App\Models\Order::with('items')->first();
+
+        if (! $order) {
+            // Create a dummy order for preview
+            return 'No orders found. Please create an order first to preview the email template.';
+        }
+
+        $notification = new \App\Notifications\OrderStatusUpdated(
+            $order,
+            'pending',
+            'processing'
+        );
+
+        return $notification->toMail($order)->render();
+    });
+}
+
 require __DIR__.'/admin.php';
 require __DIR__.'/settings.php';
