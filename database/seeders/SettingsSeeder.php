@@ -15,7 +15,7 @@ class SettingsSeeder extends Seeder
         $settings = [
             // General
             ['key' => 'store_name', 'value' => 'GarraCommerce', 'group' => 'general'],
-            ['key' => 'store_description', 'value' => 'Your trusted online store.', 'group' => 'general'],
+            ['key' => 'store_description', 'value' => 'Platform e-commerce terbaik untuk UMKM Indonesia.', 'group' => 'general'],
             ['key' => 'store_address', 'value' => 'Jl. Contoh No. 123, Jakarta', 'group' => 'general'],
             ['key' => 'store_email', 'value' => 'admin@garracommerce.com', 'group' => 'general'],
             ['key' => 'store_phone', 'value' => '+6281234567890', 'group' => 'general'],
