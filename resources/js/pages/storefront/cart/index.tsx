@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { ArrowLeft, ShoppingBag, Trash2 } from 'lucide-react';
+import { ArrowLeft, MessageCircle, ShoppingBag, Trash2 } from 'lucide-react';
 
 import { CartItemCard } from '@/components/storefront/cart-item-card';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import { Separator } from '@/components/ui/separator';
 import StorefrontLayout from '@/layouts/storefront-layout';
 import { formatCurrency } from '@/lib/utils';
 import { clear as clearCart } from '@/routes/cart';
+import { create as checkoutCreate } from '@/routes/checkout';
 import { index as productsIndex } from '@/routes/products';
 import { type Cart } from '@/types';
 
@@ -38,10 +39,10 @@ export default function CartIndex({ cart }: CartIndexProps) {
         });
     };
 
-    const handleCheckout = () => {
+    const handleQuickCheckout = () => {
         if (cart.items.length === 0) return;
 
-        // Format order details for WhatsApp
+        // Format order details for WhatsApp (quick checkout option)
         const orderLines = cart.items.map(
             (item) =>
                 `• ${item.product.name}\n  Qty: ${item.quantity} x ${formatCurrency(item.price)} = ${formatCurrency(item.subtotal)}`,
@@ -146,20 +147,32 @@ export default function CartIndex({ cart }: CartIndexProps) {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex flex-col gap-3">
-                                    <Button
-                                        className="w-full gap-2"
-                                        size="lg"
-                                        onClick={handleCheckout}
+                                    <Link
+                                        href={checkoutCreate()}
+                                        className="w-full"
                                     >
-                                        <ShoppingBag className="h-5 w-5" />
-                                        Checkout via WhatsApp
+                                        <Button
+                                            className="w-full gap-2"
+                                            size="lg"
+                                        >
+                                            <ShoppingBag className="h-5 w-5" />
+                                            Checkout
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full gap-2"
+                                        onClick={handleQuickCheckout}
+                                    >
+                                        <MessageCircle className="h-4 w-4" />
+                                        Quick Order via WhatsApp
                                     </Button>
                                     <Link
                                         href={productsIndex()}
                                         className="w-full"
                                     >
                                         <Button
-                                            variant="outline"
+                                            variant="ghost"
                                             className="w-full gap-2"
                                         >
                                             <ArrowLeft className="h-4 w-4" />

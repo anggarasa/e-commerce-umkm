@@ -125,3 +125,40 @@ export interface Cart {
     created_at: string;
     updated_at: string;
 }
+
+export interface OrderItem {
+    id: string;
+    order_id: string;
+    product_id: string | null;
+    product_name: string;
+    product_price: number;
+    quantity: number;
+    subtotal: number;
+    product?: Product;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Order {
+    id: string;
+    user_id: string | null;
+    order_number: string;
+    formatted_order_number: string;
+    customer_name: string;
+    customer_email: string | null;
+    customer_phone: string;
+    customer_address: string;
+    subtotal: number;
+    shipping_cost: number;
+    total: number;
+    status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+    status_label: string;
+    notes: string | null;
+    admin_notes: string | null;
+    items: OrderItem[];
+    user?: User | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export type OrderStatuses = Record<string, string>;

@@ -64,5 +64,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(Cart::class);
     }
-}
 
+    /**
+     * Get the user's orders.
+     */
+    public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+}

@@ -20,6 +20,13 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/count', [CartController::class, 'count'])->name('count');
 });
 
+// Checkout routes
+Route::prefix('checkout')->name('checkout.')->group(function () {
+    Route::get('/', [App\Http\Controllers\CheckoutController::class, 'create'])->name('create');
+    Route::post('/', [App\Http\Controllers\CheckoutController::class, 'store'])->name('store');
+    Route::get('/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('success');
+});
+
 // Redirect /register to home page
 Route::get('/register', function () {
     return redirect()->route('home');
