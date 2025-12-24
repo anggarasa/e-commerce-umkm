@@ -67,7 +67,9 @@ class OrderStatusUpdatedMail extends Mailable
                 'statusMessageTitle' => $this->getStatusMessageTitle(),
                 'statusMessageBg' => $this->getStatusMessageBg(),
                 'statusMessageColor' => $this->getStatusMessageColor(),
+
                 'actionUrl' => url("/orders/{$this->order->order_number}"),
+                'storeName' => \App\Models\Setting::where('key', 'store_name')->value('value') ?? config('app.name'),
             ],
         );
     }

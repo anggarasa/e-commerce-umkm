@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     Facebook,
     Instagram,
@@ -11,9 +11,11 @@ import {
 import AppLogo from '@/components/branding/app-logo';
 import { home } from '@/routes';
 import { index as productsIndex } from '@/routes/products';
+import { SharedData } from '@/types';
 
 export function StorefrontFooter() {
     const currentYear = new Date().getFullYear();
+    const { settings } = usePage<SharedData>().props;
 
     return (
         <footer className="border-t border-border/40 bg-muted/30">
@@ -25,28 +27,40 @@ export function StorefrontFooter() {
                             <AppLogo />
                         </Link>
                         <p className="text-sm text-muted-foreground">
-                            Platform e-commerce terbaik untuk UMKM Indonesia.
-                            Mulai berjualan online dengan mudah dan cepat.
+                            {settings.store_description ||
+                                'Platform e-commerce terbaik untuk UMKM Indonesia.'}
                         </p>
                         <div className="flex gap-3">
-                            <a
-                                href="#"
-                                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-primary hover:text-primary-foreground"
-                            >
-                                <Facebook className="h-4 w-4" />
-                            </a>
-                            <a
-                                href="#"
-                                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-primary hover:text-primary-foreground"
-                            >
-                                <Instagram className="h-4 w-4" />
-                            </a>
-                            <a
-                                href="#"
-                                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-primary hover:text-primary-foreground"
-                            >
-                                <Twitter className="h-4 w-4" />
-                            </a>
+                            {settings.social_facebook && (
+                                <a
+                                    href={settings.social_facebook}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-primary hover:text-primary-foreground"
+                                >
+                                    <Facebook className="h-4 w-4" />
+                                </a>
+                            )}
+                            {settings.social_instagram && (
+                                <a
+                                    href={settings.social_instagram}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-primary hover:text-primary-foreground"
+                                >
+                                    <Instagram className="h-4 w-4" />
+                                </a>
+                            )}
+                            {settings.social_twitter && (
+                                <a
+                                    href={settings.social_twitter}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-primary hover:text-primary-foreground"
+                                >
+                                    <Twitter className="h-4 w-4" />
+                                </a>
+                            )}
                         </div>
                     </div>
 
@@ -85,18 +99,24 @@ export function StorefrontFooter() {
                     <div className="space-y-4">
                         <h4 className="text-sm font-semibold">Hubungi Kami</h4>
                         <div className="flex flex-col gap-3">
-                            <div className="flex items-start gap-3 text-sm text-muted-foreground">
-                                <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                                <span>Jl. Contoh No. 123, Kota, Indonesia</span>
-                            </div>
-                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                <Phone className="h-4 w-4 shrink-0" />
-                                <span>+62 812 3456 7890</span>
-                            </div>
-                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                <Mail className="h-4 w-4 shrink-0" />
-                                <span>info@garracommerce.com</span>
-                            </div>
+                            {settings.store_address && (
+                                <div className="flex items-start gap-3 text-sm text-muted-foreground">
+                                    <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                                    <span>{settings.store_address}</span>
+                                </div>
+                            )}
+                            {settings.store_phone && (
+                                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                    <Phone className="h-4 w-4 shrink-0" />
+                                    <span>{settings.store_phone}</span>
+                                </div>
+                            )}
+                            {settings.store_email && (
+                                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                    <Mail className="h-4 w-4 shrink-0" />
+                                    <span>{settings.store_email}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -126,7 +146,8 @@ export function StorefrontFooter() {
                 <div className="mt-12 border-t border-border/40 pt-6">
                     <div className="flex flex-col items-center justify-between gap-4 text-center text-sm text-muted-foreground md:flex-row">
                         <p>
-                            &copy; {currentYear} GarraCommerce. All rights
+                            &copy; {currentYear}{' '}
+                            {settings.store_name || 'GarraCommerce'}. All rights
                             reserved.
                         </p>
                         <p>
@@ -135,7 +156,7 @@ export function StorefrontFooter() {
                                 href="#"
                                 className="font-medium text-foreground hover:underline"
                             >
-                                GarraCommerce Platform
+                                {settings.store_name || 'GarraCommerce'}
                             </a>
                         </p>
                     </div>

@@ -48,6 +48,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'cartCount' => $this->getCartCount(),
+            'settings' => \App\Models\Setting::all()->pluck('value', 'key'),
         ];
     }
 

@@ -29,7 +29,7 @@
             <td
               style="background: linear-gradient(135deg, #4361ee 0%, #3b5bdb 100%); border-radius: 16px 16px 0 0; padding: 32px 40px; text-align: center;">
               <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">
-                {{ config('app.name') }}
+                {{ $storeName }}
               </h1>
               <p style="margin: 8px 0 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">
                 Notifikasi Pesanan
@@ -157,8 +157,7 @@
               </table>
 
               <!-- Thank You -->
-              <p style="text-align: center; color: #64748b; font-size: 14px; margin: 32px 0 0 0;">
-                Terima kasih telah berbelanja di <strong style="color: #4361ee;">{{ config('app.name') }}</strong>! 💙
+              Terima kasih telah berbelanja di <strong style="color: #4361ee;">{{ $storeName }}</strong>! 💙
               </p>
 
             </td>
@@ -171,8 +170,7 @@
               <p style="margin: 0 0 8px 0; color: #64748b; font-size: 13px;">
                 Jika Anda memiliki pertanyaan, silakan hubungi kami.
               </p>
-              <p style="margin: 0; color: #94a3b8; font-size: 12px;">
-                © {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
+              © {{ date('Y') }} {{ $storeName }}. All rights reserved.
               </p>
             </td>
           </tr>

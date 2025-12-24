@@ -1,6 +1,7 @@
 import { index as categoriesIndex } from '@/actions/App/Http/Controllers/Admin/CategoryController';
 import { index as ordersIndex } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import { index as productsIndex } from '@/actions/App/Http/Controllers/Admin/ProductController';
+import { index as settingsIndex } from '@/actions/App/Http/Controllers/Admin/SettingController';
 import { NavFooter } from '@/components/navigation/nav-footer';
 import { NavMain } from '@/components/navigation/nav-main';
 import { NavUser } from '@/components/navigation/nav-user';
@@ -23,6 +24,7 @@ import {
     FolderTree,
     LayoutGrid,
     Package,
+    Settings,
 } from 'lucide-react';
 import AppLogo from '../branding/app-logo';
 
@@ -46,6 +48,11 @@ const mainNavItems: NavItem[] = [
         title: 'Pesanan',
         href: ordersIndex(),
         icon: ClipboardList,
+    },
+    {
+        title: 'Konfigurasi',
+        href: settingsIndex(),
+        icon: Settings,
     },
 ];
 
