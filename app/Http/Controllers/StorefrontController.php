@@ -60,9 +60,14 @@ class StorefrontController extends Controller
             });
         }
 
-        // Category filter
+        // Category filter (includes child categories)
         if ($categorySlug = $request->input('category')) {
-            $query->whereHas('category', fn ($q) => $q->where('slug', $categorySlug));
+            $category = Category::where('slug', $categorySlug)->first();
+            if ($category) {
+                $categoryIds = collect([$category->id])
+                    ->merge($category->children()->pluck('id'));
+                $query->whereIn('category_id', $categoryIds);
+            }
         }
 
         // Price range filter
