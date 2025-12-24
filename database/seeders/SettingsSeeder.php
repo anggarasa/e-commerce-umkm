@@ -19,6 +19,7 @@ class SettingsSeeder extends Seeder
             ['key' => 'store_address', 'value' => 'Jl. Contoh No. 123, Jakarta', 'group' => 'general'],
             ['key' => 'store_email', 'value' => 'admin@garracommerce.com', 'group' => 'general'],
             ['key' => 'store_phone', 'value' => '+6281234567890', 'group' => 'general'],
+            ['key' => 'store_operational_hours', 'value' => "Senin - Jumat: 09:00 - 17:00\nSabtu: 09:00 - 15:00\nMinggu: Tutup", 'group' => 'general'],
 
             // Social Media
             ['key' => 'social_facebook', 'value' => '', 'group' => 'social'],

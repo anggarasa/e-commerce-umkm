@@ -125,19 +125,9 @@ export function StorefrontFooter() {
                         <h4 className="text-sm font-semibold">
                             Jam Operasional
                         </h4>
-                        <div className="space-y-2 text-sm text-muted-foreground">
-                            <div className="flex justify-between">
-                                <span>Senin - Jumat</span>
-                                <span>08:00 - 17:00</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>Sabtu</span>
-                                <span>09:00 - 15:00</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>Minggu</span>
-                                <span>Tutup</span>
-                            </div>
+                        <div className="text-sm whitespace-pre-wrap text-muted-foreground">
+                            {settings.store_operational_hours ||
+                                'Senin - Jumat: 09:00 - 17:00\nSabtu: 09:00 - 15:00\nMinggu: Tutup'}
                         </div>
                     </div>
                 </div>

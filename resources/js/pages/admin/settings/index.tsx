@@ -18,6 +18,7 @@ import { Head, useForm } from '@inertiajs/react';
 import {
     Building2,
     CheckCircle2,
+    Clock,
     Facebook,
     FileText,
     Instagram,
@@ -58,6 +59,7 @@ const fieldIcons: Record<string, ReactNode> = {
     store_address: <MapPin className="size-4" />,
     store_email: <Mail className="size-4" />,
     store_phone: <Phone className="size-4" />,
+    store_operational_hours: <Clock className="size-4" />,
     social_facebook: <Facebook className="size-4" />,
     social_instagram: <Instagram className="size-4" />,
     social_twitter: <Twitter className="size-4" />,
@@ -71,6 +73,7 @@ const fieldHelpers: Record<string, string> = {
     store_address: 'Alamat lengkap toko untuk ditampilkan di footer',
     store_email: 'Email untuk menerima notifikasi pesanan',
     store_phone: 'Nomor telepon yang dapat dihubungi pelanggan',
+    store_operational_hours: 'Jadwal operasional toko yang akan ditampilkan',
     social_facebook: 'URL halaman Facebook toko',
     social_instagram: 'URL profil Instagram toko',
     social_twitter: 'URL akun Twitter/X toko',
@@ -84,6 +87,7 @@ const fieldLabels: Record<string, string> = {
     store_address: 'Alamat Toko',
     store_email: 'Email Toko',
     store_phone: 'Nomor Telepon',
+    store_operational_hours: 'Jam Operasional',
     social_facebook: 'Facebook',
     social_instagram: 'Instagram',
     social_twitter: 'Twitter / X',
@@ -209,7 +213,10 @@ export default function Settings({ settings }: Props) {
                                             const isTextarea =
                                                 setting.key ===
                                                     'store_description' ||
-                                                setting.key === 'store_address';
+                                                setting.key ===
+                                                    'store_address' ||
+                                                setting.key ===
+                                                    'store_operational_hours';
                                             const icon =
                                                 fieldIcons[setting.key];
                                             const helper =
@@ -247,7 +254,10 @@ export default function Settings({ settings }: Props) {
                                                                 setting.key ===
                                                                 'store_description'
                                                                     ? 'Masukkan deskripsi toko...'
-                                                                    : 'Masukkan alamat lengkap...'
+                                                                    : setting.key ===
+                                                                        'store_address'
+                                                                      ? 'Masukkan alamat lengkap...'
+                                                                      : 'Contoh: Senin - Jumat: 09:00 - 17:00'
                                                             }
                                                             value={
                                                                 data.settings.find(
