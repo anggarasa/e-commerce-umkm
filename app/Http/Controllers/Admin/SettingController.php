@@ -14,7 +14,7 @@ class SettingController extends Controller
     public function index()
     {
         return Inertia::render('admin/settings/index', [
-            'settings' => Setting::all()->groupBy('group'),
+            'groupedSettings' => Setting::all()->groupBy('group'),
         ]);
     }
 
@@ -23,11 +23,19 @@ class SettingController extends Controller
         $data = $request->validate([
             'settings' => 'required|array',
             'settings.*.key' => 'required|string|exists:settings,key',
-            'settings.*.value' => 'nullable|string',
+            'settings.*.value' => 'nullable',
         ]);
 
-        foreach ($data['settings'] as $settingData) {
-            Setting::where('key', $settingData['key'])->update(['value' => $settingData['value']]);
+        foreach ($data['settings'] as $index => $settingData) {
+            $key = $settingData['key'];
+            $value = $settingData['value'];
+
+            if ($key === 'store_logo' && $request->hasFile("settings.{$index}.value")) {
+                $path = $request->file("settings.{$index}.value")->store('settings', 'public');
+                $value = '/storage/' . $path;
+            }
+
+            Setting::where('key', $key)->update(['value' => $value]);
         }
 
         return redirect()->back()->with('success', 'Settings updated successfully.');

@@ -6,7 +6,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName =
+    window.appName || import.meta.env.VITE_APP_NAME || 'GarraCommerce';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),

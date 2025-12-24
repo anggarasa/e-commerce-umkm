@@ -72,7 +72,7 @@ export function StorefrontHeader({ categories = [] }: StorefrontHeaderProps) {
                             <NavigationMenuLink
                                 asChild
                                 className={cn(
-                                    'group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+                                    'group inline-flex h-9 w-max flex-row items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50',
                                 )}
                             >
                                 <Link href={home()}>Beranda</Link>
@@ -82,7 +82,7 @@ export function StorefrontHeader({ categories = [] }: StorefrontHeaderProps) {
                             <NavigationMenuLink
                                 asChild
                                 className={cn(
-                                    'group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+                                    'group inline-flex h-9 w-max flex-row items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50',
                                 )}
                             >
                                 <Link href={productsIndex()}>Semua Produk</Link>
@@ -130,7 +130,7 @@ export function StorefrontHeader({ categories = [] }: StorefrontHeaderProps) {
                             <NavigationMenuLink
                                 asChild
                                 className={cn(
-                                    'group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+                                    'group inline-flex h-9 w-max flex-row items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50',
                                 )}
                             >
                                 <Link

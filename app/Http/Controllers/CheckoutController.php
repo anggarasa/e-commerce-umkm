@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCheckoutRequest;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -30,6 +31,7 @@ class CheckoutController extends Controller
         return Inertia::render('storefront/checkout/index', [
             'cart' => $cart,
             'directProduct' => null,
+            'shippingCost' => (int) Setting::where('key', 'shipping_cost')->value('value') ?? 0,
         ]);
     }
 
@@ -62,6 +64,7 @@ class CheckoutController extends Controller
         return Inertia::render('storefront/checkout/index', [
             'cart' => null,
             'directProduct' => $directProduct,
+            'shippingCost' => (int) Setting::where('key', 'shipping_cost')->value('value') ?? 0,
         ]);
     }
 
@@ -112,7 +115,7 @@ class CheckoutController extends Controller
         }
 
         // Calculate totals
-        $shippingCost = 0;
+        $shippingCost = (int) Setting::where('key', 'shipping_cost')->value('value') ?? 0;
         $total = $subtotal + $shippingCost;
 
         // Create order

@@ -20,6 +20,8 @@ class SettingsSeeder extends Seeder
             ['key' => 'store_email', 'value' => 'admin@garracommerce.com', 'group' => 'general'],
             ['key' => 'store_phone', 'value' => '+6281234567890', 'group' => 'general'],
             ['key' => 'store_operational_hours', 'value' => "Senin - Jumat: 09:00 - 17:00\nSabtu: 09:00 - 15:00\nMinggu: Tutup", 'group' => 'general'],
+            ['key' => 'shipping_cost', 'value' => '0', 'group' => 'general'],
+            ['key' => 'store_logo', 'value' => null, 'group' => 'general'],
 
             // Social Media
             ['key' => 'social_facebook', 'value' => '', 'group' => 'social'],

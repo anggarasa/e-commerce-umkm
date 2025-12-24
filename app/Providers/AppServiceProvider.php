@@ -19,6 +19,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                $storeName = \App\Models\Setting::where('key', 'store_name')->value('value');
+                if ($storeName) {
+                    config(['app.name' => $storeName]);
+                }
+            }
+        } catch (\Throwable $th) {
+            //
+        }
     }
 }

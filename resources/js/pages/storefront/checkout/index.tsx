@@ -40,9 +40,14 @@ interface CheckoutFormData {
 interface CheckoutProps {
     cart: Cart | null;
     directProduct: DirectProduct | null;
+    shippingCost: number;
 }
 
-export default function CheckoutIndex({ cart, directProduct }: CheckoutProps) {
+export default function CheckoutIndex({
+    cart,
+    directProduct,
+    shippingCost,
+}: CheckoutProps) {
     const isDirectCheckout = directProduct !== null;
 
     const { data, setData, errors, processing, post } =
@@ -350,15 +355,23 @@ export default function CheckoutIndex({ cart, directProduct }: CheckoutProps) {
                                             <span className="text-muted-foreground">
                                                 Ongkos Kirim
                                             </span>
-                                            <span className="text-green-600">
-                                                Gratis
+                                            <span>
+                                                {shippingCost > 0 ? (
+                                                    formatCurrency(shippingCost)
+                                                ) : (
+                                                    <span className="text-green-600">
+                                                        Gratis
+                                                    </span>
+                                                )}
                                             </span>
                                         </div>
                                         <Separator />
                                         <div className="flex justify-between text-lg font-bold">
                                             <span>Total</span>
                                             <span className="text-primary">
-                                                {formatCurrency(totalPrice)}
+                                                {formatCurrency(
+                                                    totalPrice + shippingCost,
+                                                )}
                                             </span>
                                         </div>
                                     </div>
