@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { ArrowLeft, MessageCircle, ShoppingBag, Trash2 } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Trash2 } from 'lucide-react';
 
 import { CartItemCard } from '@/components/storefront/cart-item-card';
 import { Button } from '@/components/ui/button';
@@ -37,21 +37,6 @@ export default function CartIndex({ cart }: CartIndexProps) {
                 onError: () => reject(),
             });
         });
-    };
-
-    const handleQuickCheckout = () => {
-        if (cart.items.length === 0) return;
-
-        // Format order details for WhatsApp (quick checkout option)
-        const orderLines = cart.items.map(
-            (item) =>
-                `• ${item.product.name}\n  Qty: ${item.quantity} x ${formatCurrency(item.price)} = ${formatCurrency(item.subtotal)}`,
-        );
-
-        const message = `Halo, saya ingin memesan:\n\n${orderLines.join('\n\n')}\n\n*Total: ${formatCurrency(cart.total_price)}*\n\nMohon konfirmasi ketersediaan dan informasi pembayaran. Terima kasih!`;
-
-        const whatsappUrl = `https://wa.me/6281224242608?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
     };
 
     const isEmpty = cart.items.length === 0;
@@ -159,14 +144,7 @@ export default function CartIndex({ cart }: CartIndexProps) {
                                             Checkout
                                         </Button>
                                     </Link>
-                                    <Button
-                                        variant="outline"
-                                        className="w-full gap-2"
-                                        onClick={handleQuickCheckout}
-                                    >
-                                        <MessageCircle className="h-4 w-4" />
-                                        Quick Order via WhatsApp
-                                    </Button>
+
                                     <Link
                                         href={productsIndex()}
                                         className="w-full"

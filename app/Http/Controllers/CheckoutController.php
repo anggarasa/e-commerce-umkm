@@ -5,14 +5,16 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCheckoutRequest;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CheckoutController extends Controller
 {
     /**
-     * Display the checkout page.
+     * Display the checkout page (from cart).
      */
     public function create(): Response|RedirectResponse
     {
@@ -27,6 +29,39 @@ class CheckoutController extends Controller
 
         return Inertia::render('storefront/checkout/index', [
             'cart' => $cart,
+            'directProduct' => null,
+        ]);
+    }
+
+    /**
+     * Display the checkout page for a single product (Buy Now).
+     */
+    public function createFromProduct(Product $product, Request $request): Response|RedirectResponse
+    {
+        $quantity = max(1, (int) $request->query('quantity', 1));
+
+        // Validate stock
+        if ($product->stock <= 0) {
+            return redirect()->route('products.show', $product)
+                ->with('error', 'Produk tidak tersedia.');
+        }
+
+        if ($quantity > $product->stock) {
+            $quantity = $product->stock;
+        }
+
+        $product->load(['media' => fn ($q) => $q->where('is_primary', true)]);
+
+        $directProduct = [
+            'product' => $product,
+            'quantity' => $quantity,
+            'price' => $product->price,
+            'subtotal' => $product->price * $quantity,
+        ];
+
+        return Inertia::render('storefront/checkout/index', [
+            'cart' => null,
+            'directProduct' => $directProduct,
         ]);
     }
 
@@ -35,18 +70,49 @@ class CheckoutController extends Controller
      */
     public function store(StoreCheckoutRequest $request): RedirectResponse
     {
-        $cart = Cart::current();
-        $cart->load('items.product');
+        $items = [];
+        $subtotal = 0;
 
-        // Validate cart is not empty
-        if ($cart->items->isEmpty()) {
-            return redirect()->route('cart.index')
-                ->with('error', 'Keranjang belanja kosong.');
+        // Check if this is a direct product checkout
+        if ($request->has('product_id')) {
+            $product = Product::findOrFail($request->product_id);
+            $quantity = max(1, (int) $request->quantity);
+
+            // Validate stock
+            if ($product->stock < $quantity) {
+                return back()->with('error', 'Stok produk tidak mencukupi.');
+            }
+
+            $items[] = [
+                'product' => $product,
+                'quantity' => $quantity,
+                'price' => $product->price,
+                'subtotal' => $product->price * $quantity,
+            ];
+            $subtotal = $product->price * $quantity;
+        } else {
+            // Cart-based checkout
+            $cart = Cart::current();
+            $cart->load('items.product');
+
+            if ($cart->items->isEmpty()) {
+                return redirect()->route('cart.index')
+                    ->with('error', 'Keranjang belanja kosong.');
+            }
+
+            foreach ($cart->items as $item) {
+                $items[] = [
+                    'product' => $item->product,
+                    'quantity' => $item->quantity,
+                    'price' => $item->price,
+                    'subtotal' => $item->subtotal,
+                ];
+            }
+            $subtotal = $cart->total_price;
         }
 
         // Calculate totals
-        $subtotal = $cart->total_price;
-        $shippingCost = 0; // Can be calculated based on address in the future
+        $shippingCost = 0;
         $total = $subtotal + $shippingCost;
 
         // Create order
@@ -65,21 +131,24 @@ class CheckoutController extends Controller
         ]);
 
         // Create order items and update stock
-        foreach ($cart->items as $item) {
+        foreach ($items as $item) {
             $order->items()->create([
-                'product_id' => $item->product_id,
-                'product_name' => $item->product->name,
-                'product_price' => $item->price,
-                'quantity' => $item->quantity,
-                'subtotal' => $item->subtotal,
+                'product_id' => $item['product']->id,
+                'product_name' => $item['product']->name,
+                'product_price' => $item['price'],
+                'quantity' => $item['quantity'],
+                'subtotal' => $item['subtotal'],
             ]);
 
             // Decrease stock
-            $item->product->decrement('stock', $item->quantity);
+            $item['product']->decrement('stock', $item['quantity']);
         }
 
-        // Clear the cart
-        $cart->items()->delete();
+        // Clear cart if this was a cart checkout
+        if (! $request->has('product_id')) {
+            $cart = Cart::current();
+            $cart->items()->delete();
+        }
 
         // Generate WhatsApp message
         $whatsappNumber = '6281224242608';

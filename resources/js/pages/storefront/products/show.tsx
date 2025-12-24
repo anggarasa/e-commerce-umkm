@@ -4,11 +4,11 @@ import {
     ChevronLeft,
     ChevronRight,
     ImageOff,
-    MessageCircle,
     Minus,
     Package,
     Plus,
     ShoppingCart,
+    Zap,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import StorefrontLayout from '@/layouts/storefront-layout';
 import { cn, formatCurrency } from '@/lib/utils';
 import { show as showCategory } from '@/routes/categories';
+import { product as checkoutProduct } from '@/routes/checkout';
 import { index as productsIndex } from '@/routes/products';
 import { type Category, type Product, type ProductMedia } from '@/types';
 
@@ -51,12 +52,6 @@ export default function ProductShow({
             { product_id: product.id, quantity },
             { preserveScroll: true },
         );
-    };
-
-    const handleWhatsApp = () => {
-        const message = `Halo, saya tertarik dengan produk:\n\n*${product.name}*\nHarga: ${formatCurrency(product.price)}\nJumlah: ${quantity}\n\nMohon informasi lebih lanjut.`;
-        const whatsappUrl = `https://wa.me/6281224242608?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
     };
 
     const nextMedia = () => {
@@ -333,24 +328,29 @@ export default function ProductShow({
                                         ? 'Stok Habis'
                                         : 'Tambah ke Keranjang'}
                                 </Button>
-                                <Button
-                                    size="lg"
-                                    variant="outline"
-                                    className="gap-2"
-                                    disabled={isOutOfStock}
-                                    onClick={handleWhatsApp}
+                                <Link
+                                    href={checkoutProduct.url(product.id, {
+                                        query: { quantity },
+                                    })}
                                 >
-                                    <MessageCircle className="h-5 w-5" />
-                                    WhatsApp
-                                </Button>
+                                    <Button
+                                        size="lg"
+                                        variant="secondary"
+                                        className="w-full gap-2"
+                                        disabled={isOutOfStock}
+                                    >
+                                        <Zap className="h-5 w-5" />
+                                        Beli Sekarang
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
 
                         {/* Additional Info */}
                         <div className="rounded-lg border p-4 text-sm text-muted-foreground">
                             <p>
-                                🛒 Tambahkan produk ke keranjang atau langsung
-                                hubungi kami via WhatsApp untuk pemesanan.
+                                🛒 Tambahkan ke keranjang atau klik Beli
+                                Sekarang untuk langsung checkout.
                             </p>
                         </div>
                     </div>

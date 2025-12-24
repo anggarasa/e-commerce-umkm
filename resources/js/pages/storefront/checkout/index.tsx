@@ -17,7 +17,15 @@ import StorefrontLayout from '@/layouts/storefront-layout';
 import { formatCurrency } from '@/lib/utils';
 import { index as cartIndex } from '@/routes/cart';
 import { store as checkoutStore } from '@/routes/checkout';
-import { type Cart } from '@/types';
+import { show as productShow } from '@/routes/products';
+import { type Cart, type Product, type ProductMedia } from '@/types';
+
+interface DirectProduct {
+    product: Product & { media?: ProductMedia[] };
+    quantity: number;
+    price: number;
+    subtotal: number;
+}
 
 interface CheckoutFormData {
     customer_name: string;
@@ -25,13 +33,18 @@ interface CheckoutFormData {
     customer_email: string;
     customer_address: string;
     notes: string;
+    product_id?: string;
+    quantity?: number;
 }
 
 interface CheckoutProps {
-    cart: Cart;
+    cart: Cart | null;
+    directProduct: DirectProduct | null;
 }
 
-export default function CheckoutIndex({ cart }: CheckoutProps) {
+export default function CheckoutIndex({ cart, directProduct }: CheckoutProps) {
+    const isDirectCheckout = directProduct !== null;
+
     const { data, setData, errors, processing, post } =
         useForm<CheckoutFormData>({
             customer_name: '',
@@ -39,6 +52,10 @@ export default function CheckoutIndex({ cart }: CheckoutProps) {
             customer_email: '',
             customer_address: '',
             notes: '',
+            ...(isDirectCheckout && {
+                product_id: directProduct.product.id,
+                quantity: directProduct.quantity,
+            }),
         });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -46,17 +63,46 @@ export default function CheckoutIndex({ cart }: CheckoutProps) {
         post(checkoutStore.url());
     };
 
+    // Calculate totals
+    const totalItems = isDirectCheckout
+        ? directProduct.quantity
+        : (cart?.total_items ?? 0);
+    const totalPrice = isDirectCheckout
+        ? directProduct.subtotal
+        : (cart?.total_price ?? 0);
+
+    // Get items to display
+    const items = isDirectCheckout
+        ? [
+              {
+                  id: directProduct.product.id,
+                  product: directProduct.product,
+                  quantity: directProduct.quantity,
+                  price: directProduct.price,
+                  subtotal: directProduct.subtotal,
+              },
+          ]
+        : (cart?.items ?? []);
+
+    // Back link
+    const backHref = isDirectCheckout
+        ? productShow(directProduct.product.slug)
+        : cartIndex();
+    const backText = isDirectCheckout
+        ? 'Kembali ke Produk'
+        : 'Kembali ke Keranjang';
+
     return (
         <StorefrontLayout title="Checkout">
             <div className="container mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="mb-6">
                     <Link
-                        href={cartIndex()}
+                        href={backHref}
                         className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
                     >
                         <ArrowLeft className="size-4" />
-                        Kembali ke Keranjang
+                        {backText}
                     </Link>
                     <h1 className="text-3xl font-bold">Checkout</h1>
                     <p className="mt-1 text-muted-foreground">
@@ -241,7 +287,7 @@ export default function CheckoutIndex({ cart }: CheckoutProps) {
                                 <CardContent className="space-y-4">
                                     {/* Items */}
                                     <div className="max-h-60 space-y-3 overflow-y-auto">
-                                        {cart.items.map((item) => (
+                                        {items.map((item) => (
                                             <div
                                                 key={item.id}
                                                 className="flex gap-3"
@@ -249,7 +295,12 @@ export default function CheckoutIndex({ cart }: CheckoutProps) {
                                                 <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">
                                                     {item.product.media?.[0] ? (
                                                         <img
-                                                            src={`/storage/${item.product.media[0].path}`}
+                                                            src={
+                                                                item.product
+                                                                    .media[0]
+                                                                    .url ||
+                                                                `/storage/${item.product.media[0].path}`
+                                                            }
                                                             alt={
                                                                 item.product
                                                                     .name
@@ -286,13 +337,10 @@ export default function CheckoutIndex({ cart }: CheckoutProps) {
                                     <div className="space-y-2">
                                         <div className="flex justify-between text-sm">
                                             <span className="text-muted-foreground">
-                                                Subtotal ({cart.total_items}{' '}
-                                                item)
+                                                Subtotal ({totalItems} item)
                                             </span>
                                             <span>
-                                                {formatCurrency(
-                                                    cart.total_price,
-                                                )}
+                                                {formatCurrency(totalPrice)}
                                             </span>
                                         </div>
                                         <div className="flex justify-between text-sm">
@@ -307,9 +355,7 @@ export default function CheckoutIndex({ cart }: CheckoutProps) {
                                         <div className="flex justify-between text-lg font-bold">
                                             <span>Total</span>
                                             <span className="text-primary">
-                                                {formatCurrency(
-                                                    cart.total_price,
-                                                )}
+                                                {formatCurrency(totalPrice)}
                                             </span>
                                         </div>
                                     </div>

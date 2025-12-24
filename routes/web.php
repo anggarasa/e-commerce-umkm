@@ -23,6 +23,7 @@ Route::prefix('cart')->name('cart.')->group(function () {
 // Checkout routes
 Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', [App\Http\Controllers\CheckoutController::class, 'create'])->name('create');
+    Route::get('/product/{product}', [App\Http\Controllers\CheckoutController::class, 'createFromProduct'])->name('product');
     Route::post('/', [App\Http\Controllers\CheckoutController::class, 'store'])->name('store');
     Route::get('/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('success');
 });

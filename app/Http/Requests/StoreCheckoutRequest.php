@@ -27,6 +27,9 @@ class StoreCheckoutRequest extends FormRequest
             'customer_phone' => ['required', 'string', 'max:20'],
             'customer_address' => ['required', 'string', 'max:1000'],
             'notes' => ['nullable', 'string', 'max:500'],
+            // Direct product checkout fields
+            'product_id' => ['nullable', 'exists:products,id'],
+            'quantity' => ['nullable', 'integer', 'min:1'],
         ];
     }
 
