@@ -23,7 +23,7 @@ class StoreCheckoutRequest extends FormRequest
     {
         return [
             'customer_name' => ['required', 'string', 'max:255'],
-            'customer_email' => ['nullable', 'email', 'max:255'],
+            'customer_email' => ['required', 'email', 'max:255'],
             'customer_phone' => ['required', 'string', 'max:20'],
             'customer_address' => ['required', 'string', 'max:1000'],
             'notes' => ['nullable', 'string', 'max:500'],
@@ -43,6 +43,7 @@ class StoreCheckoutRequest extends FormRequest
         return [
             'customer_name.required' => 'Nama lengkap wajib diisi.',
             'customer_name.max' => 'Nama maksimal 255 karakter.',
+            'customer_email.required' => 'Email wajib diisi.',
             'customer_email.email' => 'Format email tidak valid.',
             'customer_phone.required' => 'Nomor telepon wajib diisi.',
             'customer_phone.max' => 'Nomor telepon maksimal 20 karakter.',

@@ -192,7 +192,10 @@ export default function CheckoutIndex({ cart, directProduct }: CheckoutProps) {
 
                                     <div className="space-y-2">
                                         <Label htmlFor="customer_email">
-                                            Email (opsional)
+                                            Email{' '}
+                                            <span className="text-destructive">
+                                                *
+                                            </span>
                                         </Label>
                                         <Input
                                             id="customer_email"
