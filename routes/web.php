@@ -28,6 +28,18 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('success');
 });
 
+// Order tracking routes (public)
+Route::prefix('orders')->name('orders.')->group(function () {
+    Route::get('/track', [App\Http\Controllers\Storefront\OrderController::class, 'trackForm'])->name('track');
+    Route::post('/track', [App\Http\Controllers\Storefront\OrderController::class, 'track'])->name('track.submit');
+    Route::get('/{orderNumber}', [App\Http\Controllers\Storefront\OrderController::class, 'show'])->name('show');
+});
+
+// Authenticated user orders
+Route::middleware(['auth'])->group(function () {
+    Route::get('/my-orders', [App\Http\Controllers\Storefront\OrderController::class, 'myOrders'])->name('orders.my');
+});
+
 // Redirect /register to home page
 Route::get('/register', function () {
     return redirect()->route('home');

@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Menu, Moon, Search, Sun, X } from 'lucide-react';
+import { Menu, Moon, Package, Search, Sun, X } from 'lucide-react';
 
 import AppLogo from '@/components/branding/app-logo';
 import { CartIcon } from '@/components/storefront/cart-icon';
@@ -125,6 +125,28 @@ export function StorefrontHeader({ categories = [] }: StorefrontHeaderProps) {
                                 </NavigationMenuContent>
                             </NavigationMenuItem>
                         )}
+                        {/* Order tracking link */}
+                        <NavigationMenuItem>
+                            <NavigationMenuLink
+                                asChild
+                                className={cn(
+                                    'group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+                                )}
+                            >
+                                <Link
+                                    href={
+                                        auth.user
+                                            ? '/my-orders'
+                                            : '/orders/track'
+                                    }
+                                >
+                                    <Package className="mr-1 h-4 w-4" />
+                                    {auth.user
+                                        ? 'Pesanan Saya'
+                                        : 'Lacak Pesanan'}
+                                </Link>
+                            </NavigationMenuLink>
+                        </NavigationMenuItem>
                     </NavigationMenuList>
                 </NavigationMenu>
 
@@ -226,6 +248,22 @@ export function StorefrontHeader({ categories = [] }: StorefrontHeaderProps) {
                                         ))}
                                     </>
                                 )}
+                                {/* Order tracking link in mobile */}
+                                <div className="mt-4 border-t pt-4">
+                                    <Link
+                                        href={
+                                            auth.user
+                                                ? '/my-orders'
+                                                : '/orders/track'
+                                        }
+                                        className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent"
+                                    >
+                                        <Package className="h-4 w-4" />
+                                        {auth.user
+                                            ? 'Pesanan Saya'
+                                            : 'Lacak Pesanan'}
+                                    </Link>
+                                </div>
                             </nav>
                         </SheetContent>
                     </Sheet>

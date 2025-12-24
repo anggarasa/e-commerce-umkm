@@ -67,7 +67,16 @@ class OrderController extends Controller
      */
     public function update(UpdateOrderRequest $request, Order $order): RedirectResponse
     {
+        $oldStatus = $order->status;
         $order->update($request->validated());
+        $newStatus = $order->status;
+
+        // Send email notification if status changed and email exists
+        if ($oldStatus !== $newStatus && $order->customer_email) {
+            $order->load('items');
+            \Illuminate\Support\Facades\Notification::route('mail', $order->customer_email)
+                ->notify(new \App\Notifications\OrderStatusUpdated($order, $oldStatus, $newStatus));
+        }
 
         return redirect()->route('admin.orders.show', $order)
             ->with('success', 'Status order berhasil diperbarui.');

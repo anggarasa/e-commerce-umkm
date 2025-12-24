@@ -231,6 +231,12 @@ export default function CheckoutSuccess({
                                 Kembali ke Beranda
                             </Link>
                         </Button>
+                        <Button asChild variant="secondary" className="gap-2">
+                            <Link href={`/orders/${order.order_number}`}>
+                                <Package className="size-4" />
+                                Lihat Detail Pesanan
+                            </Link>
+                        </Button>
                         <Button asChild className="gap-2">
                             <Link href={productsIndex()}>
                                 <ShoppingBag className="size-4" />
