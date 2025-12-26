@@ -10,6 +10,13 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
     Route::resource('orders', OrderController::class)->only(['index', 'show', 'update']);
+
+    // Reports
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('index');
+        Route::get('/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])->name('export');
+    });
+
     Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
     Route::put('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });

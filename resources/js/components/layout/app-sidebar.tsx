@@ -1,6 +1,7 @@
 import { index as categoriesIndex } from '@/actions/App/Http/Controllers/Admin/CategoryController';
 import { index as ordersIndex } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import { index as productsIndex } from '@/actions/App/Http/Controllers/Admin/ProductController';
+import { index as reportsIndex } from '@/actions/App/Http/Controllers/Admin/ReportController';
 import { index as settingsIndex } from '@/actions/App/Http/Controllers/Admin/SettingController';
 import { NavFooter } from '@/components/navigation/nav-footer';
 import { NavMain } from '@/components/navigation/nav-main';
@@ -18,6 +19,7 @@ import { dashboard } from '@/routes/admin';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import {
+    BarChart3,
     BookOpen,
     ClipboardList,
     Folder,
@@ -48,6 +50,11 @@ const mainNavItems: NavItem[] = [
         title: 'Pesanan',
         href: ordersIndex(),
         icon: ClipboardList,
+    },
+    {
+        title: 'Laporan',
+        href: reportsIndex(),
+        icon: BarChart3,
     },
     {
         title: 'Konfigurasi',

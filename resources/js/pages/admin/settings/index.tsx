@@ -8,6 +8,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { CurrencyInput } from '@/components/ui/currency-input';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -100,7 +101,7 @@ const fieldLabels: Record<string, string> = {
     social_instagram: 'Instagram',
     social_twitter: 'Twitter / X',
     social_tiktok: 'TikTok',
-    shipping_cost: 'Biaya Ongkos Kirim (Rp)',
+    shipping_cost: 'Biaya Ongkos Kirim',
     store_logo: 'Logo Toko',
 };
 
@@ -353,6 +354,29 @@ export default function Settings({ groupedSettings }: Props) {
                                                                     }}
                                                                 />
                                                             </div>
+                                                        ) : setting.key ===
+                                                          'shipping_cost' ? (
+                                                            <CurrencyInput
+                                                                id={setting.key}
+                                                                placeholder="0"
+                                                                value={
+                                                                    (data.settings.find(
+                                                                        (s) =>
+                                                                            s.key ===
+                                                                            setting.key,
+                                                                    )
+                                                                        ?.value as string) ||
+                                                                    ''
+                                                                }
+                                                                onChange={(
+                                                                    value,
+                                                                ) =>
+                                                                    updateSetting(
+                                                                        setting.key,
+                                                                        value,
+                                                                    )
+                                                                }
+                                                            />
                                                         ) : (
                                                             <Input
                                                                 id={setting.key}
