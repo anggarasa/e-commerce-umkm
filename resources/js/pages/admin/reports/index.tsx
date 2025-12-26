@@ -32,6 +32,21 @@ import {
     Wallet,
 } from 'lucide-react';
 import { useState } from 'react';
+import {
+    Area,
+    AreaChart,
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Cell,
+    Legend,
+    Pie,
+    PieChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from 'recharts';
 
 interface DailySale {
     date: string;
@@ -107,6 +122,37 @@ const statusColors: Record<string, string> = {
     cancelled: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
 };
 
+// Chart colors for pie chart
+const CHART_COLORS: Record<string, string> = {
+    pending: '#EAB308', // yellow
+    processing: '#3B82F6', // blue
+    shipped: '#A855F7', // purple
+    delivered: '#22C55E', // green
+    cancelled: '#EF4444', // red
+};
+
+// Bar chart gradient colors for top products
+const BAR_COLORS = [
+    'var(--chart-1)',
+    'var(--chart-2)',
+    'var(--chart-3)',
+    'var(--chart-4)',
+    'var(--chart-5)',
+];
+
+function formatShortCurrency(value: number): string {
+    if (value >= 1000000000) {
+        return `Rp ${(value / 1000000000).toFixed(1)} M`;
+    }
+    if (value >= 1000000) {
+        return `Rp ${(value / 1000000).toFixed(1)} Jt`;
+    }
+    if (value >= 1000) {
+        return `Rp ${(value / 1000).toFixed(0)} Rb`;
+    }
+    return `Rp ${value}`;
+}
+
 export default function ReportsIndex({
     stats,
     dailySales,
@@ -151,8 +197,24 @@ export default function ReportsIndex({
             `?period=${period}&date_from=${dateFrom}&date_to=${dateTo}`;
     };
 
-    // Calculate max value for chart scaling
-    const maxSalesValue = Math.max(...dailySales.map((d) => d.total), 1);
+    // Prepare pie chart data
+    const pieChartData = salesByStatus.map((item) => ({
+        name: item.label,
+        value: item.count,
+        status: item.status,
+        total: item.total,
+    }));
+
+    // Prepare bar chart data for top products
+    const barChartData = topProducts.slice(0, 5).map((product) => ({
+        name:
+            product.product_name.length > 20
+                ? product.product_name.substring(0, 20) + '...'
+                : product.product_name,
+        fullName: product.product_name,
+        quantity: product.total_quantity,
+        revenue: product.total_revenue,
+    }));
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -272,7 +334,7 @@ export default function ReportsIndex({
 
                 {/* Charts Row */}
                 <div className="grid gap-6 lg:grid-cols-3">
-                    {/* Sales Chart */}
+                    {/* Sales Chart - AreaChart */}
                     <Card className="lg:col-span-2">
                         <CardHeader>
                             <CardTitle>Grafik Penjualan</CardTitle>
@@ -281,38 +343,111 @@ export default function ReportsIndex({
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex h-64 items-end gap-1">
-                                {dailySales.map((day) => (
-                                    <div
-                                        key={day.date}
-                                        className="group relative flex flex-1 flex-col items-center"
+                            <div className="h-72 sm:h-80">
+                                {dailySales.length > 0 ? (
+                                    <ResponsiveContainer
+                                        width="100%"
+                                        height="100%"
                                     >
-                                        <div className="absolute -top-16 left-1/2 z-10 hidden -translate-x-1/2 rounded-lg bg-foreground px-2 py-1 text-xs text-background group-hover:block">
-                                            <div className="font-medium">
-                                                {formatCurrency(day.total)}
-                                            </div>
-                                            <div className="text-xs opacity-80">
-                                                {day.orders} pesanan
-                                            </div>
-                                        </div>
-                                        <div
-                                            className="w-full rounded-t-sm bg-primary/80 transition-all hover:bg-primary"
-                                            style={{
-                                                height: `${Math.max((day.total / maxSalesValue) * 100, 2)}%`,
-                                            }}
-                                        />
-                                        {dailySales.length <= 14 && (
-                                            <span className="mt-2 text-[10px] text-muted-foreground">
-                                                {day.label}
-                                            </span>
-                                        )}
+                                        <AreaChart data={dailySales}>
+                                            <defs>
+                                                <linearGradient
+                                                    id="colorSales"
+                                                    x1="0"
+                                                    y1="0"
+                                                    x2="0"
+                                                    y2="1"
+                                                >
+                                                    <stop
+                                                        offset="5%"
+                                                        stopColor="var(--chart-1)"
+                                                        stopOpacity={0.4}
+                                                    />
+                                                    <stop
+                                                        offset="95%"
+                                                        stopColor="var(--chart-1)"
+                                                        stopOpacity={0}
+                                                    />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid
+                                                strokeDasharray="3 3"
+                                                className="stroke-muted"
+                                            />
+                                            <XAxis
+                                                dataKey="label"
+                                                tick={{ fontSize: 11 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                interval="preserveStartEnd"
+                                            />
+                                            <YAxis
+                                                tick={{ fontSize: 11 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                tickFormatter={(value) =>
+                                                    formatShortCurrency(value)
+                                                }
+                                                width={70}
+                                            />
+                                            <Tooltip
+                                                formatter={(value) => [
+                                                    formatCurrency(
+                                                        Number(value) || 0,
+                                                    ),
+                                                    'Pendapatan',
+                                                ]}
+                                                labelFormatter={(label) =>
+                                                    `Tanggal: ${label}`
+                                                }
+                                                contentStyle={{
+                                                    backgroundColor:
+                                                        'var(--card)',
+                                                    border: '1px solid var(--border)',
+                                                    borderRadius: '8px',
+                                                    color: 'var(--foreground)',
+                                                }}
+                                                itemStyle={{
+                                                    color: 'var(--foreground)',
+                                                }}
+                                                labelStyle={{
+                                                    color: 'var(--foreground)',
+                                                }}
+                                            />
+                                            <Area
+                                                type="monotone"
+                                                dataKey="total"
+                                                stroke="var(--chart-1)"
+                                                fillOpacity={1}
+                                                fill="url(#colorSales)"
+                                                strokeWidth={2}
+                                                dot={{
+                                                    r: 4,
+                                                    fill: 'var(--chart-1)',
+                                                    stroke: 'var(--chart-1)',
+                                                    strokeWidth: 2,
+                                                }}
+                                                activeDot={{
+                                                    r: 6,
+                                                    fill: 'var(--chart-1)',
+                                                    stroke: 'var(--chart-1)',
+                                                    strokeWidth: 2,
+                                                }}
+                                            />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div className="flex h-full items-center justify-center rounded-xl border border-dashed border-border/50 bg-muted/30">
+                                        <p className="text-sm text-muted-foreground">
+                                            Belum ada data penjualan
+                                        </p>
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </CardContent>
                     </Card>
 
-                    {/* Sales by Status */}
+                    {/* Sales by Status - PieChart */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Status Pesanan</CardTitle>
@@ -321,83 +456,196 @@ export default function ReportsIndex({
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4">
-                                {salesByStatus.map((item) => (
-                                    <div
-                                        key={item.status}
-                                        className="flex items-center justify-between"
+                            {pieChartData.length > 0 &&
+                            pieChartData.some((d) => d.value > 0) ? (
+                                <div className="h-64">
+                                    <ResponsiveContainer
+                                        width="100%"
+                                        height="100%"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <span
-                                                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[item.status] || ''}`}
+                                        <PieChart>
+                                            <Pie
+                                                data={pieChartData}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={50}
+                                                outerRadius={80}
+                                                paddingAngle={4}
+                                                dataKey="value"
                                             >
-                                                {item.label}
-                                            </span>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="font-medium">
-                                                {item.count}
-                                            </div>
-                                            <div className="text-xs text-muted-foreground">
-                                                {formatCurrency(item.total)}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                                {salesByStatus.length === 0 && (
-                                    <p className="text-center text-sm text-muted-foreground">
-                                        Tidak ada data
+                                                {pieChartData.map(
+                                                    (entry, index) => (
+                                                        <Cell
+                                                            key={`cell-${index}`}
+                                                            fill={
+                                                                CHART_COLORS[
+                                                                    entry.status
+                                                                ] || '#8884d8'
+                                                            }
+                                                        />
+                                                    ),
+                                                )}
+                                            </Pie>
+                                            <Tooltip
+                                                formatter={(
+                                                    value,
+                                                    _name,
+                                                    props,
+                                                ) => [
+                                                    `${value} pesanan (${formatCurrency(props.payload.total)})`,
+                                                    props.payload.name,
+                                                ]}
+                                                contentStyle={{
+                                                    backgroundColor:
+                                                        'var(--card)',
+                                                    border: '1px solid var(--border)',
+                                                    borderRadius: '8px',
+                                                    color: 'var(--foreground)',
+                                                }}
+                                                itemStyle={{
+                                                    color: 'var(--foreground)',
+                                                }}
+                                                labelStyle={{
+                                                    color: 'var(--foreground)',
+                                                }}
+                                            />
+                                            <Legend
+                                                formatter={(value) => (
+                                                    <span className="text-sm text-foreground">
+                                                        {value}
+                                                    </span>
+                                                )}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            ) : (
+                                <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-border/50 bg-muted/30">
+                                    <p className="text-sm text-muted-foreground">
+                                        Tidak ada data pesanan
                                     </p>
-                                )}
-                            </div>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Bottom Row */}
                 <div className="grid gap-6 lg:grid-cols-2">
-                    {/* Top Products */}
+                    {/* Top Products - BarChart */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Produk Terlaris</CardTitle>
                             <CardDescription>
-                                Produk dengan penjualan tertinggi
+                                Top 5 produk dengan penjualan tertinggi
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4">
-                                {topProducts.map((product, index) => (
-                                    <div
-                                        key={product.product_id}
-                                        className="flex items-center gap-4"
+                            {barChartData.length > 0 ? (
+                                <div className="h-72">
+                                    <ResponsiveContainer
+                                        width="100%"
+                                        height="100%"
                                     >
-                                        <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                                            {index + 1}
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <div className="truncate font-medium">
-                                                {product.product_name}
-                                            </div>
-                                            <div className="text-xs text-muted-foreground">
-                                                {product.total_quantity} unit
-                                                terjual
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="font-medium">
-                                                {formatCurrency(
-                                                    product.total_revenue,
+                                        <BarChart
+                                            data={barChartData}
+                                            layout="vertical"
+                                            margin={{
+                                                top: 5,
+                                                right: 30,
+                                                left: 20,
+                                                bottom: 5,
+                                            }}
+                                        >
+                                            <CartesianGrid
+                                                strokeDasharray="3 3"
+                                                className="stroke-muted"
+                                                horizontal={true}
+                                                vertical={false}
+                                            />
+                                            <XAxis
+                                                type="number"
+                                                tick={{ fontSize: 11 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                tickFormatter={(value) =>
+                                                    formatShortCurrency(value)
+                                                }
+                                            />
+                                            <YAxis
+                                                type="category"
+                                                dataKey="name"
+                                                tick={{ fontSize: 11 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                width={100}
+                                            />
+                                            <Tooltip
+                                                formatter={(value, name) => {
+                                                    if (name === 'revenue') {
+                                                        return [
+                                                            formatCurrency(
+                                                                Number(value) ||
+                                                                    0,
+                                                            ),
+                                                            'Pendapatan',
+                                                        ];
+                                                    }
+                                                    return [value, name];
+                                                }}
+                                                labelFormatter={(label) => {
+                                                    const item =
+                                                        barChartData.find(
+                                                            (d) =>
+                                                                d.name ===
+                                                                label,
+                                                        );
+                                                    return (
+                                                        item?.fullName || label
+                                                    );
+                                                }}
+                                                contentStyle={{
+                                                    backgroundColor:
+                                                        'var(--card)',
+                                                    border: '1px solid var(--border)',
+                                                    borderRadius: '8px',
+                                                    color: 'var(--foreground)',
+                                                }}
+                                                itemStyle={{
+                                                    color: 'var(--foreground)',
+                                                }}
+                                                labelStyle={{
+                                                    color: 'var(--foreground)',
+                                                }}
+                                            />
+                                            <Bar
+                                                dataKey="revenue"
+                                                radius={[0, 4, 4, 0]}
+                                            >
+                                                {barChartData.map(
+                                                    (_, index) => (
+                                                        <Cell
+                                                            key={`cell-${index}`}
+                                                            fill={
+                                                                BAR_COLORS[
+                                                                    index %
+                                                                        BAR_COLORS.length
+                                                                ]
+                                                            }
+                                                        />
+                                                    ),
                                                 )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                                {topProducts.length === 0 && (
-                                    <p className="text-center text-sm text-muted-foreground">
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            ) : (
+                                <div className="flex h-72 items-center justify-center rounded-xl border border-dashed border-border/50 bg-muted/30">
+                                    <p className="text-sm text-muted-foreground">
                                         Belum ada data penjualan
                                     </p>
-                                )}
-                            </div>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 
