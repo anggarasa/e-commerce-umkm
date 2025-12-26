@@ -103,7 +103,7 @@ test('it can filter by period', function () {
         );
 });
 
-test('it can export sales to CSV', function () {
+test('it can export sales to Excel', function () {
     $user = User::factory()->create();
 
     Order::factory()->count(5)->create();
@@ -112,7 +112,7 @@ test('it can export sales to CSV', function () {
         ->get(route('admin.reports.export'));
 
     $response->assertOk()
-        ->assertHeader('Content-Type', 'text/csv; charset=UTF-8')
+        ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         ->assertDownload();
 });
 

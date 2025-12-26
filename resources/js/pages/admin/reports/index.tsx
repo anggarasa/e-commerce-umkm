@@ -252,7 +252,7 @@ export default function ReportsIndex({
                         </Select>
                         <Button onClick={handleExport} variant="outline">
                             <Download className="mr-2 size-4" />
-                            Export CSV
+                            Export Excel
                         </Button>
                     </div>
                 </div>

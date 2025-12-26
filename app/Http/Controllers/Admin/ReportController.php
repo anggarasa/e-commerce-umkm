@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\SalesReportExport;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -9,7 +10,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ReportController extends Controller
 {
@@ -59,9 +61,9 @@ class ReportController extends Controller
     }
 
     /**
-     * Export sales report to CSV.
+     * Export sales report to Excel.
      */
-    public function export(Request $request): StreamedResponse
+    public function export(Request $request): BinaryFileResponse
     {
         $period = $request->input('period', '30days');
         $dateRange = $this->getDateRange($period, $request);
@@ -69,57 +71,12 @@ class ReportController extends Controller
         $startDate = $dateRange['start'];
         $endDate = $dateRange['end'];
 
-        $orders = Order::with('items')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $filename = 'laporan-penjualan-'.$startDate->format('Y-m-d').'-'.$endDate->format('Y-m-d').'.xlsx';
 
-        $filename = 'laporan-penjualan-'.$startDate->format('Y-m-d').'-'.$endDate->format('Y-m-d').'.csv';
-
-        return response()->streamDownload(function () use ($orders) {
-            $handle = fopen('php://output', 'w');
-
-            // Add BOM for Excel UTF-8 compatibility
-            fwrite($handle, "\xEF\xBB\xBF");
-
-            // Header row
-            fputcsv($handle, [
-                'No. Pesanan',
-                'Tanggal',
-                'Pelanggan',
-                'Email',
-                'Telepon',
-                'Alamat',
-                'Jumlah Item',
-                'Subtotal',
-                'Ongkir',
-                'Total',
-                'Status',
-                'Catatan',
-            ]);
-
-            // Data rows
-            foreach ($orders as $order) {
-                fputcsv($handle, [
-                    $order->order_number,
-                    $order->created_at->format('Y-m-d H:i:s'),
-                    $order->customer_name,
-                    $order->customer_email,
-                    $order->customer_phone,
-                    $order->customer_address,
-                    $order->items->count(),
-                    $order->subtotal,
-                    $order->shipping_cost,
-                    $order->total,
-                    Order::STATUSES[$order->status] ?? $order->status,
-                    $order->notes,
-                ]);
-            }
-
-            fclose($handle);
-        }, $filename, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-        ]);
+        return Excel::download(
+            new SalesReportExport($startDate, $endDate),
+            $filename
+        );
     }
 
     /**
