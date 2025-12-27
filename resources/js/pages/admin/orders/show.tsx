@@ -1,6 +1,5 @@
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -45,6 +44,7 @@ import {
     Check,
     ChevronLeft,
     ClipboardList,
+    Loader2,
     Mail,
     MapPin,
     Package,
@@ -52,6 +52,7 @@ import {
     User,
     X,
 } from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
     order: Order;
@@ -88,17 +89,43 @@ export default function OrdersShow({ order, statuses }: Props) {
         admin_notes: order.admin_notes || '',
     });
 
+    // State for modal controls and loading
+    const [approveModalOpen, setApproveModalOpen] = useState(false);
+    const [rejectModalOpen, setRejectModalOpen] = useState(false);
+    const [approveLoading, setApproveLoading] = useState(false);
+    const [rejectLoading, setRejectLoading] = useState(false);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         put(update.url(order.id));
     };
 
     const handleApproveCancellation = () => {
-        router.post(approveCancellation.url(order.id));
+        setApproveLoading(true);
+        router.post(
+            approveCancellation.url(order.id),
+            {},
+            {
+                onFinish: () => {
+                    setApproveLoading(false);
+                    setApproveModalOpen(false);
+                },
+            },
+        );
     };
 
     const handleRejectCancellation = () => {
-        router.post(rejectCancellation.url(order.id));
+        setRejectLoading(true);
+        router.post(
+            rejectCancellation.url(order.id),
+            {},
+            {
+                onFinish: () => {
+                    setRejectLoading(false);
+                    setRejectModalOpen(false);
+                },
+            },
+        );
     };
 
     const formatDate = (dateString: string) => {
@@ -352,7 +379,12 @@ export default function OrdersShow({ order, statuses }: Props) {
                                             </p>
                                         )}
                                         <div className="flex gap-3 pt-2">
-                                            <AlertDialog>
+                                            <AlertDialog
+                                                open={approveModalOpen}
+                                                onOpenChange={
+                                                    setApproveModalOpen
+                                                }
+                                            >
                                                 <AlertDialogTrigger asChild>
                                                     <Button
                                                         variant="destructive"
@@ -377,21 +409,40 @@ export default function OrdersShow({ order, statuses }: Props) {
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
-                                                        <AlertDialogCancel>
+                                                        <AlertDialogCancel
+                                                            disabled={
+                                                                approveLoading
+                                                            }
+                                                        >
                                                             Batal
                                                         </AlertDialogCancel>
-                                                        <AlertDialogAction
+                                                        <Button
                                                             onClick={
                                                                 handleApproveCancellation
                                                             }
+                                                            disabled={
+                                                                approveLoading
+                                                            }
                                                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                                         >
-                                                            Ya, Setujui
-                                                        </AlertDialogAction>
+                                                            {approveLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 size-4 animate-spin" />
+                                                                    Memproses...
+                                                                </>
+                                                            ) : (
+                                                                'Ya, Setujui'
+                                                            )}
+                                                        </Button>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>
-                                            <AlertDialog>
+                                            <AlertDialog
+                                                open={rejectModalOpen}
+                                                onOpenChange={
+                                                    setRejectModalOpen
+                                                }
+                                            >
                                                 <AlertDialogTrigger asChild>
                                                     <Button
                                                         variant="outline"
@@ -417,16 +468,30 @@ export default function OrdersShow({ order, statuses }: Props) {
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
-                                                        <AlertDialogCancel>
+                                                        <AlertDialogCancel
+                                                            disabled={
+                                                                rejectLoading
+                                                            }
+                                                        >
                                                             Batal
                                                         </AlertDialogCancel>
-                                                        <AlertDialogAction
+                                                        <Button
                                                             onClick={
                                                                 handleRejectCancellation
                                                             }
+                                                            disabled={
+                                                                rejectLoading
+                                                            }
                                                         >
-                                                            Ya, Tolak
-                                                        </AlertDialogAction>
+                                                            {rejectLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 size-4 animate-spin" />
+                                                                    Memproses...
+                                                                </>
+                                                            ) : (
+                                                                'Ya, Tolak'
+                                                            )}
+                                                        </Button>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>

@@ -125,11 +125,21 @@ class OrderController extends Controller
                 ->with('error', 'Pesanan ini tidak memiliki permintaan pembatalan.');
         }
 
+        // Store the reason before clearing for the notification
+        $cancellationReason = $order->cancellation_reason ?? 'Tidak ada alasan yang diberikan';
+
         $order->update([
             'cancellation_requested' => false,
             'cancellation_reason' => null,
             'cancellation_requested_at' => null,
         ]);
+
+        // Send email notification if email exists
+        if ($order->customer_email) {
+            $order->load('items');
+            \Illuminate\Support\Facades\Notification::route('mail', $order->customer_email)
+                ->notify(new \App\Notifications\CancellationRejected($order, $cancellationReason));
+        }
 
         return redirect()->route('admin.orders.show', $order)
             ->with('success', 'Permintaan pembatalan telah ditolak.');

@@ -141,4 +141,44 @@ describe('Order Cancellation Management', function () {
         $response->assertRedirect("/admin/orders/{$order->id}");
         $response->assertSessionHas('error');
     });
+
+    it('sends email notification when rejecting cancellation request', function () {
+        \Illuminate\Support\Facades\Notification::fake();
+
+        $order = Order::factory()->create([
+            'cancellation_requested' => true,
+            'cancellation_reason' => 'Berubah pikiran',
+            'cancellation_requested_at' => now(),
+            'status' => 'processing',
+            'customer_email' => 'customer@example.com',
+        ]);
+
+        $this->actingAs($this->admin)
+            ->post("/admin/orders/{$order->id}/reject-cancellation");
+
+        \Illuminate\Support\Facades\Notification::assertSentOnDemand(
+            \App\Notifications\CancellationRejected::class,
+            function ($notification, $channels, $notifiable) use ($order) {
+                return $notifiable->routes['mail'] === 'customer@example.com'
+                    && $notification->order->id === $order->id
+                    && $notification->cancellationReason === 'Berubah pikiran';
+            }
+        );
+    });
+
+    it('does not send email notification when order has no email', function () {
+        \Illuminate\Support\Facades\Notification::fake();
+
+        $order = Order::factory()->create([
+            'cancellation_requested' => true,
+            'cancellation_reason' => 'Berubah pikiran',
+            'status' => 'processing',
+            'customer_email' => null,
+        ]);
+
+        $this->actingAs($this->admin)
+            ->post("/admin/orders/{$order->id}/reject-cancellation");
+
+        \Illuminate\Support\Facades\Notification::assertNothingSent();
+    });
 });
