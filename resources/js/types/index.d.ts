@@ -156,6 +156,9 @@ export interface Order {
     status_label: string;
     notes: string | null;
     admin_notes: string | null;
+    cancellation_requested: boolean;
+    cancellation_reason: string | null;
+    cancellation_requested_at: string | null;
     items: OrderItem[];
     user?: User | null;
     created_at: string;

@@ -7,12 +7,24 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import StorefrontLayout from '@/layouts/storefront-layout';
 import { formatCurrency } from '@/lib/utils';
 import { type Order, type OrderStatuses } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import {
+    AlertCircle,
     ArrowLeft,
     Calendar,
     CheckCircle2,
@@ -25,6 +37,7 @@ import {
     User,
     XCircle,
 } from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
     order: Order;
@@ -74,6 +87,12 @@ const statusSteps = [
 ];
 
 export default function OrderShow({ order, statuses, isOwner }: Props) {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        cancellation_reason: '',
+    });
+
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('id-ID', {
             day: 'numeric',
@@ -91,6 +110,21 @@ export default function OrderShow({ order, statuses, isOwner }: Props) {
     };
 
     const currentStepIndex = getCurrentStepIndex();
+
+    // Check if cancellation request can be made
+    const canRequestCancellation =
+        ['pending', 'processing'].includes(order.status) &&
+        !order.cancellation_requested;
+
+    const handleCancellationSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(`/orders/${order.order_number}/cancel-request`, {
+            onSuccess: () => {
+                setIsDialogOpen(false);
+                reset();
+            },
+        });
+    };
 
     return (
         <StorefrontLayout title={`Pesanan #${order.order_number}`}>
@@ -208,6 +242,141 @@ export default function OrderShow({ order, statuses, isOwner }: Props) {
                                         hubungi kami jika ada pertanyaan.
                                     </p>
                                 </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Cancellation Request Status */}
+                    {order.cancellation_requested &&
+                        order.status !== 'cancelled' && (
+                            <Card className="mb-6 border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950/30">
+                                <CardContent className="flex items-center gap-4 pt-6">
+                                    <div className="flex size-12 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/50">
+                                        <AlertCircle className="size-6 text-orange-600" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-semibold text-orange-800 dark:text-orange-400">
+                                            Permintaan Pembatalan Diajukan
+                                        </p>
+                                        <p className="text-sm text-orange-600 dark:text-orange-500">
+                                            Menunggu konfirmasi dari admin.
+                                            {order.cancellation_requested_at && (
+                                                <span className="ml-1">
+                                                    Diajukan pada{' '}
+                                                    {formatDate(
+                                                        order.cancellation_requested_at,
+                                                    )}
+                                                </span>
+                                            )}
+                                        </p>
+                                        {order.cancellation_reason && (
+                                            <p className="mt-2 text-sm text-orange-700 dark:text-orange-400">
+                                                <span className="font-medium">
+                                                    Alasan:
+                                                </span>{' '}
+                                                {order.cancellation_reason}
+                                            </p>
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                    {/* Request Cancellation Button */}
+                    {canRequestCancellation && (
+                        <Card className="mb-6">
+                            <CardContent className="flex items-center justify-between gap-4 pt-6">
+                                <div>
+                                    <p className="font-medium">
+                                        Ingin Membatalkan Pesanan?
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        Anda dapat mengajukan pembatalan jika
+                                        pesanan belum dikirim.
+                                    </p>
+                                </div>
+                                <Dialog
+                                    open={isDialogOpen}
+                                    onOpenChange={setIsDialogOpen}
+                                >
+                                    <DialogTrigger asChild>
+                                        <Button
+                                            variant="destructive"
+                                            className="shrink-0"
+                                        >
+                                            <XCircle className="mr-2 size-4" />
+                                            Ajukan Pembatalan
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-md">
+                                        <form
+                                            onSubmit={handleCancellationSubmit}
+                                        >
+                                            <DialogHeader>
+                                                <DialogTitle>
+                                                    Ajukan Pembatalan Pesanan
+                                                </DialogTitle>
+                                                <DialogDescription>
+                                                    Mohon berikan alasan
+                                                    pembatalan. Admin akan
+                                                    memproses permintaan Anda.
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="my-4 space-y-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="cancellation_reason">
+                                                        Alasan Pembatalan{' '}
+                                                        <span className="text-red-500">
+                                                            *
+                                                        </span>
+                                                    </Label>
+                                                    <Textarea
+                                                        id="cancellation_reason"
+                                                        placeholder="Tuliskan alasan mengapa Anda ingin membatalkan pesanan ini..."
+                                                        value={
+                                                            data.cancellation_reason
+                                                        }
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                'cancellation_reason',
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                        rows={4}
+                                                        className="resize-none"
+                                                    />
+                                                    {errors.cancellation_reason && (
+                                                        <p className="text-sm text-red-500">
+                                                            {
+                                                                errors.cancellation_reason
+                                                            }
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <DialogFooter className="gap-2 sm:gap-0">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={() =>
+                                                        setIsDialogOpen(false)
+                                                    }
+                                                >
+                                                    Batal
+                                                </Button>
+                                                <Button
+                                                    type="submit"
+                                                    variant="destructive"
+                                                    disabled={processing}
+                                                >
+                                                    {processing
+                                                        ? 'Memproses...'
+                                                        : 'Ajukan Pembatalan'}
+                                                </Button>
+                                            </DialogFooter>
+                                        </form>
+                                    </DialogContent>
+                                </Dialog>
                             </CardContent>
                         </Card>
                     )}

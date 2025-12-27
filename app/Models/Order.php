@@ -26,12 +26,17 @@ class Order extends Model
         'status',
         'notes',
         'admin_notes',
+        'cancellation_requested',
+        'cancellation_reason',
+        'cancellation_requested_at',
     ];
 
     protected $casts = [
         'subtotal' => 'decimal:2',
         'shipping_cost' => 'decimal:2',
         'total' => 'decimal:2',
+        'cancellation_requested' => 'boolean',
+        'cancellation_requested_at' => 'datetime',
     ];
 
     protected $appends = ['formatted_order_number', 'status_label'];
@@ -114,5 +119,13 @@ class Order extends Model
         $random = strtoupper(substr(uniqid(), -4));
 
         return "{$prefix}{$date}{$random}";
+    }
+
+    /**
+     * Scope to filter orders with cancellation requests.
+     */
+    public function scopeHasCancellationRequest(Builder $query): Builder
+    {
+        return $query->where('cancellation_requested', true);
     }
 }

@@ -21,7 +21,7 @@ import { formatCurrency } from '@/lib/utils';
 import { index as indexRoute, show as showRoute } from '@/routes/admin/orders';
 import { type BreadcrumbItem, type Order, type OrderStatuses } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Eye, Package, Search, X } from 'lucide-react';
+import { AlertTriangle, Eye, Package, Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface Props {
@@ -41,7 +41,9 @@ interface Props {
         date_from?: string;
         date_to?: string;
         limit?: number;
+        cancellation_request?: string;
     };
+    cancellationRequestsCount: number;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -64,9 +66,17 @@ const statusColors: Record<string, string> = {
     cancelled: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
 };
 
-export default function OrdersIndex({ orders, statuses, filters }: Props) {
+export default function OrdersIndex({
+    orders,
+    statuses,
+    filters,
+    cancellationRequestsCount,
+}: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || 'all');
+    const [showCancellationRequests, setShowCancellationRequests] = useState(
+        filters.cancellation_request === 'true',
+    );
 
     // Debounce search
     useEffect(() => {
@@ -105,9 +115,25 @@ export default function OrdersIndex({ orders, statuses, filters }: Props) {
     const clearFilters = () => {
         setSearch('');
         setStatus('all');
+        setShowCancellationRequests(false);
         router.visit(indexRoute.url(), {
             data: {
                 limit: filters.limit,
+            },
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
+    const toggleCancellationRequests = () => {
+        const newValue = !showCancellationRequests;
+        setShowCancellationRequests(newValue);
+        router.visit(indexRoute.url(), {
+            data: {
+                ...filters,
+                cancellation_request: newValue ? 'true' : null,
+                page: 1,
             },
             preserveState: true,
             preserveScroll: true,
@@ -154,12 +180,21 @@ export default function OrdersIndex({ orders, statuses, filters }: Props) {
             id: 'order_number',
             header: 'No. Pesanan',
             cell: (order) => (
-                <Link
-                    href={showRoute.url(order.id)}
-                    className="font-medium text-primary hover:underline"
-                >
-                    #{order.order_number}
-                </Link>
+                <div className="flex items-center gap-2">
+                    <Link
+                        href={showRoute.url(order.id)}
+                        className="font-medium text-primary hover:underline"
+                    >
+                        #{order.order_number}
+                    </Link>
+                    {order.cancellation_requested &&
+                        order.status !== 'cancelled' && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                                <AlertTriangle className="size-3" />
+                                Batal
+                            </span>
+                        )}
+                </div>
             ),
         },
         {
@@ -280,7 +315,28 @@ export default function OrdersIndex({ orders, statuses, filters }: Props) {
                                     )}
                                 </SelectContent>
                             </Select>
-                            {(search || status !== 'all') && (
+                            <Button
+                                variant={
+                                    showCancellationRequests
+                                        ? 'default'
+                                        : 'outline'
+                                }
+                                onClick={toggleCancellationRequests}
+                                className="relative gap-2"
+                            >
+                                <AlertTriangle className="size-4" />
+                                <span className="hidden sm:inline">
+                                    Permintaan Batal
+                                </span>
+                                {cancellationRequestsCount > 0 && (
+                                    <span className="inline-flex size-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+                                        {cancellationRequestsCount}
+                                    </span>
+                                )}
+                            </Button>
+                            {(search ||
+                                status !== 'all' ||
+                                showCancellationRequests) && (
                                 <Button
                                     variant="ghost"
                                     onClick={clearFilters}

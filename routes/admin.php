@@ -10,6 +10,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
     Route::resource('orders', OrderController::class)->only(['index', 'show', 'update']);
+    Route::post('orders/{order}/approve-cancellation', [OrderController::class, 'approveCancellation'])->name('orders.approve-cancellation');
+    Route::post('orders/{order}/reject-cancellation', [OrderController::class, 'rejectCancellation'])->name('orders.reject-cancellation');
 
     // Reports
     Route::prefix('reports')->name('reports.')->group(function () {

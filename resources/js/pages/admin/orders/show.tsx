@@ -1,3 +1,14 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,11 +30,19 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib/utils';
-import { index, show as showRoute, update } from '@/routes/admin/orders';
-import { type BreadcrumbItem, type Order, type OrderStatuses } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
 import {
+    approveCancellation,
+    index,
+    rejectCancellation,
+    show as showRoute,
+    update,
+} from '@/routes/admin/orders';
+import { type BreadcrumbItem, type Order, type OrderStatuses } from '@/types';
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import {
+    AlertTriangle,
     Calendar,
+    Check,
     ChevronLeft,
     ClipboardList,
     Mail,
@@ -31,6 +50,7 @@ import {
     Package,
     Phone,
     User,
+    X,
 } from 'lucide-react';
 
 interface Props {
@@ -71,6 +91,14 @@ export default function OrdersShow({ order, statuses }: Props) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         put(update.url(order.id));
+    };
+
+    const handleApproveCancellation = () => {
+        router.post(approveCancellation.url(order.id));
+    };
+
+    const handleRejectCancellation = () => {
+        router.post(rejectCancellation.url(order.id));
     };
 
     const formatDate = (dateString: string) => {
@@ -289,6 +317,123 @@ export default function OrdersShow({ order, statuses }: Props) {
                                 </CardContent>
                             </Card>
                         )}
+
+                        {/* Cancellation Request */}
+                        {order.cancellation_requested &&
+                            order.status !== 'cancelled' && (
+                                <Card className="border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950/30">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 text-orange-700 dark:text-orange-400">
+                                            <AlertTriangle className="size-5" />
+                                            Permintaan Pembatalan
+                                        </CardTitle>
+                                        <CardDescription className="text-orange-600 dark:text-orange-500">
+                                            Pelanggan mengajukan pembatalan
+                                            pesanan ini
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        {order.cancellation_reason && (
+                                            <div>
+                                                <p className="text-sm font-medium text-orange-700 dark:text-orange-400">
+                                                    Alasan Pembatalan:
+                                                </p>
+                                                <p className="mt-1 text-orange-800 dark:text-orange-300">
+                                                    {order.cancellation_reason}
+                                                </p>
+                                            </div>
+                                        )}
+                                        {order.cancellation_requested_at && (
+                                            <p className="text-sm text-orange-600 dark:text-orange-500">
+                                                Diajukan pada:{' '}
+                                                {formatDate(
+                                                    order.cancellation_requested_at,
+                                                )}
+                                            </p>
+                                        )}
+                                        <div className="flex gap-3 pt-2">
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button
+                                                        variant="destructive"
+                                                        className="gap-2"
+                                                    >
+                                                        <Check className="size-4" />
+                                                        Setujui Pembatalan
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>
+                                                            Setujui Pembatalan
+                                                            Pesanan?
+                                                        </AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            Pesanan akan diubah
+                                                            statusnya menjadi
+                                                            "Dibatalkan".
+                                                            Tindakan ini tidak
+                                                            dapat dibatalkan.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>
+                                                            Batal
+                                                        </AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                            onClick={
+                                                                handleApproveCancellation
+                                                            }
+                                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                        >
+                                                            Ya, Setujui
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        className="gap-2"
+                                                    >
+                                                        <X className="size-4" />
+                                                        Tolak Pembatalan
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>
+                                                            Tolak Pembatalan
+                                                            Pesanan?
+                                                        </AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            Permintaan
+                                                            pembatalan akan
+                                                            dihapus dan pesanan
+                                                            akan dilanjutkan
+                                                            dengan status saat
+                                                            ini.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>
+                                                            Batal
+                                                        </AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                            onClick={
+                                                                handleRejectCancellation
+                                                            }
+                                                        >
+                                                            Ya, Tolak
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
                     </div>
 
                     {/* Right Column - Actions */}

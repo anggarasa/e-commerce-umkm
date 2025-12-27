@@ -198,3 +198,117 @@ it('filters orders by status', function () {
             ->has('orders.data', 1)
         );
 });
+
+// Cancellation request tests
+it('allows guest to request cancellation for pending order', function () {
+    $order = Order::factory()->create([
+        'order_number' => 'ORD20241227PEND',
+        'status' => 'pending',
+        'cancellation_requested' => false,
+    ]);
+
+    $this->post('/orders/ORD20241227PEND/cancel-request', [
+        'cancellation_reason' => 'Ingin mengubah alamat pengiriman',
+    ])
+        ->assertRedirect('/orders/ORD20241227PEND')
+        ->assertSessionHas('success');
+
+    $this->assertDatabaseHas('orders', [
+        'id' => $order->id,
+        'cancellation_requested' => true,
+        'cancellation_reason' => 'Ingin mengubah alamat pengiriman',
+    ]);
+});
+
+it('allows guest to request cancellation for processing order', function () {
+    $order = Order::factory()->create([
+        'order_number' => 'ORD20241227PROC',
+        'status' => 'processing',
+        'cancellation_requested' => false,
+    ]);
+
+    $this->post('/orders/ORD20241227PROC/cancel-request', [
+        'cancellation_reason' => 'Produk tidak tersedia di tempat lain',
+    ])
+        ->assertRedirect('/orders/ORD20241227PROC')
+        ->assertSessionHas('success');
+
+    $this->assertDatabaseHas('orders', [
+        'id' => $order->id,
+        'cancellation_requested' => true,
+    ]);
+});
+
+it('does not allow cancellation request for shipped order', function () {
+    Order::factory()->create([
+        'order_number' => 'ORD20241227SHIP',
+        'status' => 'shipped',
+        'cancellation_requested' => false,
+    ]);
+
+    $this->post('/orders/ORD20241227SHIP/cancel-request', [
+        'cancellation_reason' => 'Tidak ingin lagi',
+    ])
+        ->assertSessionHasErrors('cancellation_reason');
+});
+
+it('does not allow cancellation request for delivered order', function () {
+    Order::factory()->create([
+        'order_number' => 'ORD20241227DLVR',
+        'status' => 'delivered',
+        'cancellation_requested' => false,
+    ]);
+
+    $this->post('/orders/ORD20241227DLVR/cancel-request', [
+        'cancellation_reason' => 'Tidak sesuai',
+    ])
+        ->assertSessionHasErrors('cancellation_reason');
+});
+
+it('does not allow cancellation request for already cancelled order', function () {
+    Order::factory()->create([
+        'order_number' => 'ORD20241227CNCL',
+        'status' => 'cancelled',
+        'cancellation_requested' => false,
+    ]);
+
+    $this->post('/orders/ORD20241227CNCL/cancel-request', [
+        'cancellation_reason' => 'Sudah dibatalkan',
+    ])
+        ->assertSessionHasErrors('cancellation_reason');
+});
+
+it('does not allow duplicate cancellation request', function () {
+    Order::factory()->create([
+        'order_number' => 'ORD20241227DUPE',
+        'status' => 'pending',
+        'cancellation_requested' => true,
+        'cancellation_reason' => 'Alasan pertama',
+    ]);
+
+    $this->post('/orders/ORD20241227DUPE/cancel-request', [
+        'cancellation_reason' => 'Alasan kedua',
+    ])
+        ->assertSessionHasErrors('cancellation_reason');
+});
+
+it('requires cancellation reason', function () {
+    Order::factory()->create([
+        'order_number' => 'ORD20241227RQRD',
+        'status' => 'pending',
+        'cancellation_requested' => false,
+    ]);
+
+    $this->post('/orders/ORD20241227RQRD/cancel-request', [
+        'cancellation_reason' => '',
+    ])
+        ->assertSessionHasErrors('cancellation_reason');
+});
+
+it('returns error for non-existent order on cancellation request', function () {
+    $this->post('/orders/INVALIDORDER/cancel-request', [
+        'cancellation_reason' => 'Alasan batal',
+    ])
+        ->assertRedirect('/orders/track')
+        ->assertSessionHasErrors('order_number');
+});

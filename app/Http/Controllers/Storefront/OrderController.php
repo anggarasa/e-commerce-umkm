@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Storefront\RequestCancellationRequest;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -92,5 +93,41 @@ class OrderController extends Controller
             'statuses' => Order::STATUSES,
             'isOwner' => $isOwner,
         ]);
+    }
+
+    /**
+     * Request cancellation for an order.
+     */
+    public function requestCancellation(RequestCancellationRequest $request, string $orderNumber): RedirectResponse
+    {
+        $order = Order::where('order_number', $orderNumber)->first();
+
+        if (! $order) {
+            return redirect()->route('orders.track')
+                ->withErrors(['order_number' => 'Pesanan tidak ditemukan.']);
+        }
+
+        // Check if order can be cancelled (only pending or processing)
+        if (! in_array($order->status, ['pending', 'processing'])) {
+            return back()->withErrors([
+                'cancellation_reason' => 'Pesanan dengan status ini tidak dapat dibatalkan.',
+            ]);
+        }
+
+        // Check if cancellation already requested
+        if ($order->cancellation_requested) {
+            return back()->withErrors([
+                'cancellation_reason' => 'Request pembatalan sudah pernah diajukan untuk pesanan ini.',
+            ]);
+        }
+
+        $order->update([
+            'cancellation_requested' => true,
+            'cancellation_reason' => $request->cancellation_reason,
+            'cancellation_requested_at' => now(),
+        ]);
+
+        return redirect()->route('orders.show', $order->order_number)
+            ->with('success', 'Request pembatalan berhasil diajukan. Admin akan memproses permintaan Anda.');
     }
 }

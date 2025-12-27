@@ -33,6 +33,7 @@ Route::prefix('orders')->name('orders.')->group(function () {
     Route::get('/track', [App\Http\Controllers\Storefront\OrderController::class, 'trackForm'])->name('track');
     Route::post('/track', [App\Http\Controllers\Storefront\OrderController::class, 'track'])->name('track.submit');
     Route::get('/{orderNumber}', [App\Http\Controllers\Storefront\OrderController::class, 'show'])->name('show');
+    Route::post('/{orderNumber}/cancel-request', [App\Http\Controllers\Storefront\OrderController::class, 'requestCancellation'])->name('cancel-request');
 });
 
 // Authenticated user orders
