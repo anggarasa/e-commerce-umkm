@@ -80,18 +80,24 @@ export function StorefrontFooter() {
                             >
                                 Semua Produk
                             </Link>
-                            <a
-                                href="#"
+                            <Link
+                                href="/page/about-us"
                                 className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                             >
                                 Tentang Kami
-                            </a>
-                            <a
-                                href="#"
+                            </Link>
+                            <Link
+                                href="/page/privacy-policy"
                                 className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                             >
                                 Kebijakan Privasi
-                            </a>
+                            </Link>
+                            <Link
+                                href="/page/terms-of-service"
+                                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                            >
+                                Syarat & Ketentuan
+                            </Link>
                         </nav>
                     </div>
 

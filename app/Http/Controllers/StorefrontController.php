@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -37,9 +38,19 @@ class StorefrontController extends Controller
             $category->products_count += $category->children->sum('products_count');
         });
 
+        // Get homepage settings
+        $homepageSettings = Setting::where('group', 'homepage')
+            ->get()
+            ->mapWithKeys(fn ($setting) => [
+                $setting->key => $setting->type === 'json'
+                    ? json_decode($setting->value, true)
+                    : $setting->value,
+            ]);
+
         return Inertia::render('welcome', [
             'featuredProducts' => $featuredProducts,
             'featuredCategories' => $featuredCategories,
+            'homepageSettings' => $homepageSettings,
         ]);
     }
 

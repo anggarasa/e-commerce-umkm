@@ -2,11 +2,13 @@ import { Link } from '@inertiajs/react';
 import {
     ArrowRight,
     Headphones,
+    HelpCircle,
     Shield,
     ShoppingBag,
     Star,
     Truck,
 } from 'lucide-react';
+import { ReactNode } from 'react';
 
 import { CategoryCard } from '@/components/storefront/category-card';
 import { ProductCard } from '@/components/storefront/product-card';
@@ -15,15 +17,102 @@ import StorefrontLayout from '@/layouts/storefront-layout';
 import { index as productsIndex } from '@/routes/products';
 import { type CategoryWithCount, type Product } from '@/types';
 
+interface Feature {
+    icon: string;
+    title: string;
+    description: string;
+}
+
+interface HomepageSettings {
+    hero_badge?: string;
+    hero_title?: string;
+    hero_description?: string;
+    hero_cta_primary?: string;
+    hero_cta_secondary?: string;
+    features?: Feature[];
+    cta_title?: string;
+    cta_description?: string;
+    cta_button_text?: string;
+}
+
 interface WelcomeProps {
     featuredProducts: Product[];
     featuredCategories: CategoryWithCount[];
+    homepageSettings?: HomepageSettings;
 }
+
+const getIconComponent = (iconName: string): ReactNode => {
+    const iconMap: Record<string, ReactNode> = {
+        truck: <Truck className="h-6 w-6" />,
+        shield: <Shield className="h-6 w-6" />,
+        headphones: <Headphones className="h-6 w-6" />,
+        star: <Star className="h-6 w-6" />,
+    };
+    return iconMap[iconName] || <HelpCircle className="h-6 w-6" />;
+};
 
 export default function Welcome({
     featuredProducts = [],
     featuredCategories = [],
+    homepageSettings = {},
 }: WelcomeProps) {
+    // Default values
+    const heroBadge =
+        homepageSettings.hero_badge || 'Platform E-commerce Terbaik untuk UMKM';
+    const heroTitle =
+        homepageSettings.hero_title ||
+        'Temukan Produk Berkualitas untuk Kebutuhan Anda';
+    const heroDescription =
+        homepageSettings.hero_description ||
+        'Belanja lebih mudah dengan koleksi produk terlengkap. Kualitas terjamin, harga terjangkau, dan pengiriman cepat ke seluruh Indonesia.';
+    const heroCtaPrimary = homepageSettings.hero_cta_primary || 'Mulai Belanja';
+    const heroCtaSecondary =
+        homepageSettings.hero_cta_secondary || 'Lihat Katalog';
+    const ctaTitle = homepageSettings.cta_title || 'Siap untuk Berbelanja?';
+    const ctaDescription =
+        homepageSettings.cta_description ||
+        'Temukan ribuan produk berkualitas dengan harga terbaik. Hubungi kami via WhatsApp untuk pemesanan cepat dan mudah.';
+    const ctaButtonText = homepageSettings.cta_button_text || 'Jelajahi Produk';
+    const features = homepageSettings.features || [
+        {
+            icon: 'truck',
+            title: 'Pengiriman Cepat',
+            description: 'Ke seluruh Indonesia',
+        },
+        {
+            icon: 'shield',
+            title: 'Produk Original',
+            description: '100% keaslian terjamin',
+        },
+        {
+            icon: 'headphones',
+            title: 'Layanan 24/7',
+            description: 'Customer service siap membantu',
+        },
+        {
+            icon: 'star',
+            title: 'Harga Terbaik',
+            description: 'Kompetitif dan terjangkau',
+        },
+    ];
+
+    // Parse hero title to highlight "Berkualitas"
+    const renderHeroTitle = () => {
+        const parts = heroTitle.split('Berkualitas');
+        if (parts.length === 2) {
+            return (
+                <>
+                    {parts[0]}
+                    <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                        Berkualitas
+                    </span>
+                    {parts[1]}
+                </>
+            );
+        }
+        return heroTitle;
+    };
+
     return (
         <StorefrontLayout title="Beranda" categories={featuredCategories}>
             {/* Hero Section */}
@@ -33,19 +122,13 @@ export default function Welcome({
                     <div className="mx-auto max-w-3xl text-center">
                         <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
                             <Star className="h-4 w-4 fill-primary" />
-                            Platform E-commerce Terbaik untuk UMKM
+                            {heroBadge}
                         </div>
                         <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground lg:text-6xl">
-                            Temukan Produk{' '}
-                            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                                Berkualitas
-                            </span>{' '}
-                            untuk Kebutuhan Anda
+                            {renderHeroTitle()}
                         </h1>
                         <p className="mb-8 text-lg text-muted-foreground lg:text-xl">
-                            Belanja lebih mudah dengan koleksi produk
-                            terlengkap. Kualitas terjamin, harga terjangkau, dan
-                            pengiriman cepat ke seluruh Indonesia.
+                            {heroDescription}
                         </p>
                         <div className="flex flex-col justify-center gap-4 sm:flex-row">
                             <Link href={productsIndex()}>
@@ -54,7 +137,7 @@ export default function Welcome({
                                     className="w-full gap-2 sm:w-auto"
                                 >
                                     <ShoppingBag className="h-5 w-5" />
-                                    Mulai Belanja
+                                    {heroCtaPrimary}
                                 </Button>
                             </Link>
                             <Link href={productsIndex()}>
@@ -63,7 +146,7 @@ export default function Welcome({
                                     variant="outline"
                                     className="w-full gap-2 sm:w-auto"
                                 >
-                                    Lihat Katalog
+                                    {heroCtaSecondary}
                                     <ArrowRight className="h-5 w-5" />
                                 </Button>
                             </Link>
@@ -77,60 +160,32 @@ export default function Welcome({
             </section>
 
             {/* Features Section */}
-            <section className="border-b border-border/40 bg-muted/30 py-8">
-                <div className="container mx-auto px-4">
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                                <Truck className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold">
-                                    Pengiriman Cepat
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Ke seluruh Indonesia
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                                <Shield className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold">
-                                    Produk Original
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                    100% keaslian terjamin
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                                <Headphones className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold">Layanan 24/7</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Customer service siap membantu
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                                <Star className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold">Harga Terbaik</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Kompetitif dan terjangkau
-                                </p>
-                            </div>
+            {features.length > 0 && (
+                <section className="border-b border-border/40 bg-muted/30 py-8">
+                    <div className="container mx-auto px-4">
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            {features.map((feature, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-4"
+                                >
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                        {getIconComponent(feature.icon)}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold">
+                                            {feature.title}
+                                        </h4>
+                                        <p className="text-sm text-muted-foreground">
+                                            {feature.description}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
 
             {/* Featured Categories */}
             {featuredCategories.length > 0 && (
@@ -195,12 +250,10 @@ export default function Welcome({
                     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary to-primary/80 px-8 py-16 text-center text-primary-foreground lg:px-16">
                         <div className="relative z-10">
                             <h2 className="mb-4 text-3xl font-bold lg:text-4xl">
-                                Siap untuk Berbelanja?
+                                {ctaTitle}
                             </h2>
                             <p className="mx-auto mb-8 max-w-2xl text-lg text-primary-foreground/90">
-                                Temukan ribuan produk berkualitas dengan harga
-                                terbaik. Hubungi kami via WhatsApp untuk
-                                pemesanan cepat dan mudah.
+                                {ctaDescription}
                             </p>
                             <Link href={productsIndex()}>
                                 <Button
@@ -209,7 +262,7 @@ export default function Welcome({
                                     className="gap-2"
                                 >
                                     <ShoppingBag className="h-5 w-5" />
-                                    Jelajahi Produk
+                                    {ctaButtonText}
                                 </Button>
                             </Link>
                         </div>

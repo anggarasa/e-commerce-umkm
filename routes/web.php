@@ -10,6 +10,9 @@ Route::get('/products', [StorefrontController::class, 'products'])->name('produc
 Route::get('/products/{product:slug}', [StorefrontController::class, 'productDetail'])->name('products.show');
 Route::get('/category/{category:slug}', [StorefrontController::class, 'category'])->name('categories.show');
 
+// Static pages
+Route::get('/page/{slug}', [\App\Http\Controllers\PageController::class, 'show'])->name('pages.show');
+
 // Cart routes
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');

@@ -1,4 +1,8 @@
 import { index as categoriesIndex } from '@/actions/App/Http/Controllers/Admin/CategoryController';
+import {
+    homepage as cmsHomepage,
+    pages as cmsPages,
+} from '@/actions/App/Http/Controllers/Admin/CMSController';
 import { index as ordersIndex } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import { index as productsIndex } from '@/actions/App/Http/Controllers/Admin/ProductController';
 import { index as reportsIndex } from '@/actions/App/Http/Controllers/Admin/ReportController';
@@ -22,9 +26,11 @@ import {
     BarChart3,
     BookOpen,
     ClipboardList,
+    FileText,
     Folder,
     FolderTree,
     LayoutGrid,
+    LayoutTemplate,
     Package,
     Settings,
 } from 'lucide-react';
@@ -55,6 +61,16 @@ const mainNavItems: NavItem[] = [
         title: 'Laporan',
         href: reportsIndex(),
         icon: BarChart3,
+    },
+    {
+        title: 'CMS',
+        href: cmsHomepage(),
+        icon: LayoutTemplate,
+    },
+    {
+        title: 'Halaman',
+        href: cmsPages(),
+        icon: FileText,
     },
     {
         title: 'Konfigurasi',
