@@ -166,3 +166,14 @@ export interface Order {
 }
 
 export type OrderStatuses = Record<string, string>;
+
+export interface AdminNotification {
+    id: string;
+    type: string;
+    title: string;
+    message: string;
+    data: Record<string, unknown> | null;
+    read_at: string | null;
+    created_at: string;
+    updated_at: string;
+}

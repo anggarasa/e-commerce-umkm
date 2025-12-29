@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Storefront;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Storefront\RequestCancellationRequest;
 use App\Models\Order;
+use App\Services\AdminNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -126,6 +127,9 @@ class OrderController extends Controller
             'cancellation_reason' => $request->cancellation_reason,
             'cancellation_requested_at' => now(),
         ]);
+
+        // Create admin notification for cancellation request
+        app(AdminNotificationService::class)->notifyCancellationRequest($order);
 
         return redirect()->route('orders.show', $order->order_number)
             ->with('success', 'Request pembatalan berhasil diajukan. Admin akan memproses permintaan Anda.');

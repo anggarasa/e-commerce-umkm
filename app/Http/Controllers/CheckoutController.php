@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Setting;
+use App\Services\AdminNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -152,6 +153,9 @@ class CheckoutController extends Controller
             $cart = Cart::current();
             $cart->items()->delete();
         }
+
+        // Create admin notification for new order
+        app(AdminNotificationService::class)->notifyNewOrder($order);
 
         // Generate WhatsApp message
         $whatsappNumber = '6281224242608';

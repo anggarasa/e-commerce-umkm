@@ -21,4 +21,12 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
     Route::put('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+
+    // Notifications
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'index'])->name('index');
+        Route::get('/count', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'count'])->name('count');
+        Route::post('/{notification}/read', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'markAsRead'])->name('mark-read');
+        Route::post('/read-all', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+    });
 });

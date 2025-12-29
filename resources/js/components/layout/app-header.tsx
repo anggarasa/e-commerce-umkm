@@ -35,6 +35,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 import AppLogo from '../branding/app-logo';
 import AppLogoIcon from '../branding/app-logo-icon';
+import { NotificationDropdown } from './notification-dropdown';
 
 const mainNavItems: NavItem[] = [
     {
@@ -226,6 +227,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 ))}
                             </div>
                         </div>
+                        <NotificationDropdown />
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
