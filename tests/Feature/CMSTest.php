@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\ContentPage;
 use App\Models\Setting;
 use App\Models\User;
 
@@ -39,92 +38,23 @@ describe('CMS Homepage Settings', function () {
     });
 });
 
-describe('CMS Content Pages', function () {
-    it('can view content pages list', function () {
-        ContentPage::factory()->count(3)->create();
-
-        $this->actingAs($this->admin)
-            ->get('/admin/cms/pages')
+describe('Static Pages', function () {
+    it('can view about us page', function () {
+        $this->get('/about-us')
             ->assertSuccessful()
-            ->assertInertia(fn ($page) => $page
-                ->component('admin/cms/pages/index')
-                ->has('pages', 3)
-            );
+            ->assertInertia(fn ($page) => $page->component('storefront/about-us'));
     });
 
-    it('can edit content page', function () {
-        $page = ContentPage::factory()->create();
-
-        $this->actingAs($this->admin)
-            ->get("/admin/cms/pages/{$page->id}/edit")
+    it('can view privacy policy page', function () {
+        $this->get('/privacy-policy')
             ->assertSuccessful()
-            ->assertInertia(fn ($p) => $p
-                ->component('admin/cms/pages/edit')
-                ->has('page')
-            );
+            ->assertInertia(fn ($page) => $page->component('storefront/privacy-policy'));
     });
 
-    it('can update content page', function () {
-        $page = ContentPage::factory()->create([
-            'title' => 'Original Title',
-            'content' => '<p>Original content</p>',
-        ]);
-
-        $this->actingAs($this->admin)
-            ->put("/admin/cms/pages/{$page->id}", [
-                'title' => 'Updated Title',
-                'content' => '<p>Updated content</p>',
-                'meta_description' => 'Updated description',
-                'is_active' => true,
-            ])
-            ->assertRedirect();
-
-        $page->refresh();
-        expect($page->title)->toBe('Updated Title');
-        expect($page->content)->toBe('<p>Updated content</p>');
-        expect($page->meta_description)->toBe('Updated description');
-    });
-
-    it('validates required fields when updating page', function () {
-        $page = ContentPage::factory()->create();
-
-        $this->actingAs($this->admin)
-            ->put("/admin/cms/pages/{$page->id}", [
-                'title' => '',
-                'content' => '',
-            ])
-            ->assertSessionHasErrors(['title', 'content']);
-    });
-});
-
-describe('Storefront Pages', function () {
-    it('can view static page on storefront', function () {
-        $page = ContentPage::factory()->create([
-            'slug' => 'about-us',
-            'is_active' => true,
-        ]);
-
-        $this->get('/page/about-us')
+    it('can view terms of service page', function () {
+        $this->get('/terms-of-service')
             ->assertSuccessful()
-            ->assertInertia(fn ($p) => $p
-                ->component('storefront/pages/show')
-                ->has('page')
-            );
-    });
-
-    it('returns 404 for inactive page', function () {
-        ContentPage::factory()->create([
-            'slug' => 'hidden-page',
-            'is_active' => false,
-        ]);
-
-        $this->get('/page/hidden-page')
-            ->assertNotFound();
-    });
-
-    it('returns 404 for non-existent page', function () {
-        $this->get('/page/non-existent')
-            ->assertNotFound();
+            ->assertInertia(fn ($page) => $page->component('storefront/terms-of-service'));
     });
 
     it('homepage displays with homepage settings', function () {

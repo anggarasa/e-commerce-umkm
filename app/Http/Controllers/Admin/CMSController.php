@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ContentPage;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,44 +51,5 @@ class CMSController extends Controller
         }
 
         return redirect()->back()->with('success', 'Homepage settings updated successfully.');
-    }
-
-    /**
-     * Display list of content pages.
-     */
-    public function pages(): Response
-    {
-        $pages = ContentPage::orderBy('title')->get();
-
-        return Inertia::render('admin/cms/pages/index', [
-            'pages' => $pages,
-        ]);
-    }
-
-    /**
-     * Edit a content page.
-     */
-    public function editPage(ContentPage $contentPage): Response
-    {
-        return Inertia::render('admin/cms/pages/edit', [
-            'page' => $contentPage,
-        ]);
-    }
-
-    /**
-     * Update a content page.
-     */
-    public function updatePage(Request $request, ContentPage $contentPage): RedirectResponse
-    {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'meta_description' => 'nullable|string|max:500',
-            'is_active' => 'boolean',
-        ]);
-
-        $contentPage->update($data);
-
-        return redirect()->back()->with('success', 'Page updated successfully.');
     }
 }

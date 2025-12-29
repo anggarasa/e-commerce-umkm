@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             SettingsSeeder::class,
             OrderSeeder::class,
-            CMSSeeder::class
         ]);
     }
 }

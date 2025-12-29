@@ -11,7 +11,9 @@ Route::get('/products/{product:slug}', [StorefrontController::class, 'productDet
 Route::get('/category/{category:slug}', [StorefrontController::class, 'category'])->name('categories.show');
 
 // Static pages
-Route::get('/page/{slug}', [\App\Http\Controllers\PageController::class, 'show'])->name('pages.show');
+Route::get('/about-us', [\App\Http\Controllers\StaticPageController::class, 'aboutUs'])->name('pages.about');
+Route::get('/privacy-policy', [\App\Http\Controllers\StaticPageController::class, 'privacyPolicy'])->name('pages.privacy');
+Route::get('/terms-of-service', [\App\Http\Controllers\StaticPageController::class, 'termsOfService'])->name('pages.terms');
 
 // Cart routes
 Route::prefix('cart')->name('cart.')->group(function () {

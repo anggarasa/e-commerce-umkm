@@ -1,8 +1,5 @@
 import { index as categoriesIndex } from '@/actions/App/Http/Controllers/Admin/CategoryController';
-import {
-    homepage as cmsHomepage,
-    pages as cmsPages,
-} from '@/actions/App/Http/Controllers/Admin/CMSController';
+import { homepage as cmsHomepage } from '@/actions/App/Http/Controllers/Admin/CMSController';
 import { index as ordersIndex } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import { index as productsIndex } from '@/actions/App/Http/Controllers/Admin/ProductController';
 import { index as reportsIndex } from '@/actions/App/Http/Controllers/Admin/ReportController';
@@ -26,7 +23,6 @@ import {
     BarChart3,
     BookOpen,
     ClipboardList,
-    FileText,
     Folder,
     FolderTree,
     LayoutGrid,
@@ -66,11 +62,6 @@ const mainNavItems: NavItem[] = [
         title: 'CMS',
         href: cmsHomepage(),
         icon: LayoutTemplate,
-    },
-    {
-        title: 'Halaman',
-        href: cmsPages(),
-        icon: FileText,
     },
     {
         title: 'Konfigurasi',
