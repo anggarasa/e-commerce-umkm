@@ -23,17 +23,33 @@ import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, useForm } from '@inertiajs/react';
 import {
+    Award,
+    Box,
     CheckCircle2,
+    Clock,
+    CreditCard,
+    Gift,
+    Globe,
     Headphones,
+    Heart,
     HelpCircle,
     Home,
     Loader2,
+    Lock,
+    Mail,
+    MapPin,
+    Phone,
     Plus,
+    RefreshCcw,
     Save,
     Shield,
     Star,
+    Tag,
+    ThumbsUp,
     Trash2,
     Truck,
+    Wallet,
+    Zap,
 } from 'lucide-react';
 import { FormEventHandler, ReactNode } from 'react';
 
@@ -74,6 +90,38 @@ const iconOptions = [
         icon: <Headphones className="size-4" />,
     },
     { value: 'star', label: 'Bintang', icon: <Star className="size-4" /> },
+    {
+        value: 'credit-card',
+        label: 'Pembayaran',
+        icon: <CreditCard className="size-4" />,
+    },
+    {
+        value: 'refresh-ccw',
+        label: 'Pengembalian',
+        icon: <RefreshCcw className="size-4" />,
+    },
+    { value: 'box', label: 'Paket', icon: <Box className="size-4" /> },
+    { value: 'map-pin', label: 'Lokasi', icon: <MapPin className="size-4" /> },
+    { value: 'clock', label: 'Waktu', icon: <Clock className="size-4" /> },
+    { value: 'gift', label: 'Hadiah', icon: <Gift className="size-4" /> },
+    { value: 'lock', label: 'Keamanan', icon: <Lock className="size-4" /> },
+    { value: 'phone', label: 'Telepon', icon: <Phone className="size-4" /> },
+    { value: 'mail', label: 'Email', icon: <Mail className="size-4" /> },
+    {
+        value: 'award',
+        label: 'Penghargaan',
+        icon: <Award className="size-4" />,
+    },
+    {
+        value: 'thumbs-up',
+        label: 'Jempol',
+        icon: <ThumbsUp className="size-4" />,
+    },
+    { value: 'wallet', label: 'Dompet', icon: <Wallet className="size-4" /> },
+    { value: 'zap', label: 'Cepat', icon: <Zap className="size-4" /> },
+    { value: 'globe', label: 'Global', icon: <Globe className="size-4" /> },
+    { value: 'heart', label: 'Favorit', icon: <Heart className="size-4" /> },
+    { value: 'tag', label: 'Label', icon: <Tag className="size-4" /> },
 ];
 
 const getIconComponent = (iconName: string): ReactNode => {
@@ -82,6 +130,22 @@ const getIconComponent = (iconName: string): ReactNode => {
         shield: <Shield className="size-4" />,
         headphones: <Headphones className="size-4" />,
         star: <Star className="size-4" />,
+        'credit-card': <CreditCard className="size-4" />,
+        'refresh-ccw': <RefreshCcw className="size-4" />,
+        box: <Box className="size-4" />,
+        'map-pin': <MapPin className="size-4" />,
+        clock: <Clock className="size-4" />,
+        gift: <Gift className="size-4" />,
+        lock: <Lock className="size-4" />,
+        phone: <Phone className="size-4" />,
+        mail: <Mail className="size-4" />,
+        award: <Award className="size-4" />,
+        'thumbs-up': <ThumbsUp className="size-4" />,
+        wallet: <Wallet className="size-4" />,
+        zap: <Zap className="size-4" />,
+        globe: <Globe className="size-4" />,
+        heart: <Heart className="size-4" />,
+        tag: <Tag className="size-4" />,
     };
     return iconMap[iconName] || <HelpCircle className="size-4" />;
 };

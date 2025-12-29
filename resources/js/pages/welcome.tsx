@@ -1,12 +1,28 @@
 import { Link } from '@inertiajs/react';
 import {
     ArrowRight,
+    Award,
+    Box,
+    Clock,
+    CreditCard,
+    Gift,
+    Globe,
     Headphones,
+    Heart,
     HelpCircle,
+    Lock,
+    Mail,
+    MapPin,
+    Phone,
+    RefreshCcw,
     Shield,
     ShoppingBag,
     Star,
+    Tag,
+    ThumbsUp,
     Truck,
+    Wallet,
+    Zap,
 } from 'lucide-react';
 import { ReactNode } from 'react';
 
@@ -47,6 +63,22 @@ const getIconComponent = (iconName: string): ReactNode => {
         shield: <Shield className="h-6 w-6" />,
         headphones: <Headphones className="h-6 w-6" />,
         star: <Star className="h-6 w-6" />,
+        'credit-card': <CreditCard className="h-6 w-6" />,
+        'refresh-ccw': <RefreshCcw className="h-6 w-6" />,
+        box: <Box className="h-6 w-6" />,
+        'map-pin': <MapPin className="h-6 w-6" />,
+        clock: <Clock className="h-6 w-6" />,
+        gift: <Gift className="h-6 w-6" />,
+        lock: <Lock className="h-6 w-6" />,
+        phone: <Phone className="h-6 w-6" />,
+        mail: <Mail className="h-6 w-6" />,
+        award: <Award className="h-6 w-6" />,
+        'thumbs-up': <ThumbsUp className="h-6 w-6" />,
+        wallet: <Wallet className="h-6 w-6" />,
+        zap: <Zap className="h-6 w-6" />,
+        globe: <Globe className="h-6 w-6" />,
+        heart: <Heart className="h-6 w-6" />,
+        tag: <Tag className="h-6 w-6" />,
     };
     return iconMap[iconName] || <HelpCircle className="h-6 w-6" />;
 };
