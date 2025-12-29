@@ -1,9 +1,11 @@
 <?php
 
+use App\Mail\AdminNotificationMail;
 use App\Models\AdminNotification;
 use App\Models\Order;
 use App\Models\User;
 use App\Services\AdminNotificationService;
+use Illuminate\Support\Facades\Mail;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
@@ -13,7 +15,7 @@ test('notification is created when new order is placed', function () {
         'total' => 150000,
     ]);
 
-    $service = new AdminNotificationService();
+    $service = new AdminNotificationService;
     $notification = $service->notifyNewOrder($order);
 
     expect($notification)->toBeInstanceOf(AdminNotification::class);
@@ -35,7 +37,7 @@ test('notification is created when cancellation is requested', function () {
         'cancellation_reason' => 'Changed my mind',
     ]);
 
-    $service = new AdminNotificationService();
+    $service = new AdminNotificationService;
     $notification = $service->notifyCancellationRequest($order);
 
     expect($notification)->toBeInstanceOf(AdminNotification::class);
@@ -210,4 +212,75 @@ test('checkout creates admin notification for new order', function () {
     $this->assertDatabaseHas('admin_notifications', [
         'type' => 'new_order',
     ]);
+});
+
+test('email is sent when new order notification is created', function () {
+    Mail::fake();
+
+    config(['mail.admin_email' => 'admin@example.com']);
+
+    $order = Order::factory()->create([
+        'customer_name' => 'Test Customer',
+        'total' => 100000,
+    ]);
+
+    $service = new AdminNotificationService;
+    $service->notifyNewOrder($order);
+
+    Mail::assertQueued(AdminNotificationMail::class, function ($mail) {
+        return $mail->hasTo('admin@example.com');
+    });
+});
+
+test('email is sent when cancellation request notification is created', function () {
+    Mail::fake();
+
+    config(['mail.admin_email' => 'admin@example.com']);
+
+    $order = Order::factory()->create([
+        'customer_name' => 'Test Customer',
+        'cancellation_reason' => 'Out of stock',
+    ]);
+
+    $service = new AdminNotificationService;
+    $service->notifyCancellationRequest($order);
+
+    Mail::assertQueued(AdminNotificationMail::class, function ($mail) {
+        return $mail->hasTo('admin@example.com');
+    });
+});
+
+test('email is not sent when admin email is not configured', function () {
+    Mail::fake();
+
+    config(['mail.admin_email' => null]);
+
+    $order = Order::factory()->create([
+        'customer_name' => 'Test Customer',
+        'total' => 100000,
+    ]);
+
+    $service = new AdminNotificationService;
+    $service->notifyNewOrder($order);
+
+    Mail::assertNothingQueued();
+});
+
+test('admin notification mail has correct content', function () {
+    $notification = AdminNotification::create([
+        'type' => AdminNotification::TYPE_NEW_ORDER,
+        'title' => 'Pesanan Baru',
+        'message' => 'Pesanan baru ORD-001 dari John Doe sebesar Rp 150.000',
+        'data' => [
+            'order_id' => 'test-uuid',
+            'order_number' => 'ORD-001',
+            'customer_name' => 'John Doe',
+            'total' => 150000,
+        ],
+    ]);
+
+    $mail = new AdminNotificationMail($notification);
+
+    expect($mail->notification->title)->toBe('Pesanan Baru');
+    expect($mail->notification->type)->toBe(AdminNotification::TYPE_NEW_ORDER);
 });

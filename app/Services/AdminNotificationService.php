@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Mail\AdminNotificationMail;
 use App\Models\AdminNotification;
 use App\Models\Order;
+use Illuminate\Support\Facades\Mail;
 
 class AdminNotificationService
 {
@@ -12,7 +14,7 @@ class AdminNotificationService
      */
     public function notifyNewOrder(Order $order): AdminNotification
     {
-        return AdminNotification::create([
+        $notification = AdminNotification::create([
             'type' => AdminNotification::TYPE_NEW_ORDER,
             'title' => 'Pesanan Baru',
             'message' => "Pesanan baru {$order->formatted_order_number} dari {$order->customer_name} sebesar Rp ".number_format((float) ($order->total ?? 0), 0, ',', '.'),
@@ -23,6 +25,10 @@ class AdminNotificationService
                 'total' => $order->total,
             ],
         ]);
+
+        $this->sendEmailNotification($notification);
+
+        return $notification;
     }
 
     /**
@@ -30,7 +36,7 @@ class AdminNotificationService
      */
     public function notifyCancellationRequest(Order $order): AdminNotification
     {
-        return AdminNotification::create([
+        $notification = AdminNotification::create([
             'type' => AdminNotification::TYPE_CANCELLATION_REQUEST,
             'title' => 'Permintaan Pembatalan',
             'message' => "Pelanggan {$order->customer_name} meminta pembatalan pesanan {$order->formatted_order_number}",
@@ -41,5 +47,21 @@ class AdminNotificationService
                 'cancellation_reason' => $order->cancellation_reason,
             ],
         ]);
+
+        $this->sendEmailNotification($notification);
+
+        return $notification;
+    }
+
+    /**
+     * Send email notification to admin.
+     */
+    private function sendEmailNotification(AdminNotification $notification): void
+    {
+        $adminEmail = config('mail.admin_email');
+
+        if ($adminEmail) {
+            Mail::to($adminEmail)->send(new AdminNotificationMail($notification));
+        }
     }
 }
