@@ -109,12 +109,12 @@ const cmsSubItems = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        href: 'https://github.com/anggarasa/e-commerce-umkm',
         icon: Folder,
     },
     {
         title: 'Dokumentasi',
-        href: 'https://laravel.com/docs/starter-kits#react',
+        href: 'https://github.com/anggarasa/e-commerce-umkm/blob/main/README.md',
         icon: BookOpen,
     },
 ];
