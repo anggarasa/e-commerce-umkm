@@ -1,5 +1,11 @@
 {
-    "agents": ["gemini"],
-    "editors": ["vscode"],
-    "guidelines": ["laravel/fortify"]
+    "agents": [
+        "gemini"
+    ],
+    "editors": [
+        "vscode"
+    ],
+    "guidelines": [
+        "laravel/fortify"
+    ]
 }
