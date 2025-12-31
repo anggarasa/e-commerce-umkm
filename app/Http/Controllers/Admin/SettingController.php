@@ -14,7 +14,7 @@ class SettingController extends Controller
     public function index()
     {
         return Inertia::render('admin/settings/index', [
-            'groupedSettings' => Setting::all()->groupBy('group'),
+            'groupedSettings' => Setting::whereIn('group', ['general', 'social'])->get()->groupBy('group'),
         ]);
     }
 

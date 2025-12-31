@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import StorefrontLayout from '@/layouts/storefront-layout';
 import { submit } from '@/routes/orders/track';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { LogIn, Package, Search, ShoppingBag } from 'lucide-react';
+import { Package, Search, ShoppingBag } from 'lucide-react';
 
 export default function TrackOrder() {
     const { data, setData, post, processing, errors } = useForm({
@@ -105,7 +105,7 @@ export default function TrackOrder() {
 
                     {/* Additional Options */}
                     <div className="mt-6 space-y-4">
-                        <Card>
+                        {/* <Card>
                             <CardContent className="flex items-center gap-4 py-4">
                                 <div className="flex size-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
                                     <LogIn className="size-5 text-blue-600 dark:text-blue-400" />
@@ -120,7 +120,7 @@ export default function TrackOrder() {
                                     <Link href="/login">Login</Link>
                                 </Button>
                             </CardContent>
-                        </Card>
+                        </Card> */}
 
                         <Card>
                             <CardContent className="flex items-center gap-4 py-4">
