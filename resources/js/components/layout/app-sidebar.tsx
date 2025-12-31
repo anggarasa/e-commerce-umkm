@@ -2,6 +2,7 @@ import { index as categoriesIndex } from '@/actions/App/Http/Controllers/Admin/C
 import {
     aboutUs as cmsAboutUs,
     homepage as cmsHomepage,
+    privacyPolicy as cmsPrivacyPolicy,
 } from '@/actions/App/Http/Controllers/Admin/CMSController';
 import { index as ordersIndex } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import { index as productsIndex } from '@/actions/App/Http/Controllers/Admin/ProductController';
@@ -90,6 +91,11 @@ const cmsSubItems = [
         title: 'Tentang Kami',
         href: cmsAboutUs(),
         icon: Users,
+    },
+    {
+        title: 'Kebijakan Privasi',
+        href: cmsPrivacyPolicy(),
+        icon: BookOpen,
     },
 ];
 

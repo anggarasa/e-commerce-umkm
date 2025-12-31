@@ -1,0 +1,51 @@
+/* Rich Text Editor Styling */
+.rich-text-editor .ql-toolbar {
+    @apply border-0 border-b border-input bg-muted/30;
+}
+
+.rich-text-editor .ql-container {
+    @apply border-0;
+}
+
+.rich-text-editor .ql-editor {
+    @apply min-h-[150px] text-sm text-foreground;
+}
+
+.rich-text-editor .ql-editor.ql-blank::before {
+    @apply text-muted-foreground not-italic;
+}
+
+.rich-text-editor .ql-stroke {
+    @apply stroke-foreground;
+}
+
+.rich-text-editor .ql-fill {
+    @apply fill-foreground;
+}
+
+.rich-text-editor .ql-picker {
+    @apply text-foreground;
+}
+
+.rich-text-editor .ql-picker-options {
+    @apply rounded-md border border-input bg-popover text-popover-foreground shadow-md;
+}
+
+.rich-text-editor .ql-picker-item:hover {
+    @apply bg-accent text-accent-foreground;
+}
+
+.rich-text-editor .ql-toolbar button:hover,
+.rich-text-editor .ql-toolbar button.ql-active {
+    @apply text-primary;
+}
+
+.rich-text-editor .ql-toolbar button:hover .ql-stroke,
+.rich-text-editor .ql-toolbar button.ql-active .ql-stroke {
+    @apply stroke-primary;
+}
+
+.rich-text-editor .ql-toolbar button:hover .ql-fill,
+.rich-text-editor .ql-toolbar button.ql-active .ql-fill {
+    @apply fill-primary;
+}

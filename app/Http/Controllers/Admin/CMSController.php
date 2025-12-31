@@ -122,4 +122,50 @@ class CMSController extends Controller
 
         return redirect()->back()->with('success', 'About Us settings updated successfully.');
     }
+
+    /**
+     * Display privacy policy CMS settings.
+     */
+    public function privacyPolicy(): Response
+    {
+        $privacyPolicySettings = Setting::where('group', 'privacy_policy')->get()->keyBy('key');
+
+        return Inertia::render('admin/cms/privacy-policy', [
+            'settings' => $privacyPolicySettings,
+        ]);
+    }
+
+    /**
+     * Update privacy policy CMS settings.
+     */
+    public function updatePrivacyPolicy(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            // Hero Section
+            'privacy_policy_hero_title' => 'nullable|string|max:255',
+            'privacy_policy_hero_description' => 'nullable|string|max:500',
+            'privacy_policy_last_updated' => 'nullable|date',
+            // Sections
+            'privacy_policy_sections' => 'nullable|array',
+            'privacy_policy_sections.*.id' => 'required|string|max:50',
+            'privacy_policy_sections.*.icon' => 'required|string|max:50',
+            'privacy_policy_sections.*.title' => 'required|string|max:255',
+            'privacy_policy_sections.*.content' => 'required|string',
+            // Footer Note
+            'privacy_policy_footer_note' => 'nullable|string|max:1000',
+        ]);
+
+        $jsonFields = [
+            'privacy_policy_sections',
+        ];
+
+        foreach ($data as $key => $value) {
+            if (in_array($key, $jsonFields)) {
+                $value = json_encode($value);
+            }
+            Setting::where('key', $key)->update(['value' => $value]);
+        }
+
+        return redirect()->back()->with('success', 'Privacy Policy settings updated successfully.');
+    }
 }

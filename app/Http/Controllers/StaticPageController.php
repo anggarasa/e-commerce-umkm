@@ -44,8 +44,11 @@ class StaticPageController extends Controller
      */
     public function privacyPolicy(): Response
     {
+        $privacyPolicySettings = Setting::where('group', 'privacy_policy')->get()->keyBy('key');
+
         return Inertia::render('storefront/privacy-policy', [
             'categories' => $this->getCategories(),
+            'privacyPolicySettings' => $privacyPolicySettings,
         ]);
     }
 

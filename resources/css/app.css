@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 
 @import 'tw-animate-css';
+@import './rich-text-editor.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -215,6 +216,88 @@
 }
 
 @layer components {
+    /* Rich Text Content Display (for Quill editor output) */
+    .rich-text-content {
+        @apply leading-relaxed text-muted-foreground;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .rich-text-content h1 {
+        @apply mt-6 mb-4 text-2xl font-bold text-foreground first:mt-0;
+    }
+
+    .rich-text-content h2 {
+        @apply mt-5 mb-3 text-xl font-semibold text-foreground first:mt-0;
+    }
+
+    .rich-text-content h3 {
+        @apply mt-4 mb-3 text-lg font-semibold text-foreground first:mt-0;
+    }
+
+    .rich-text-content p {
+        @apply mb-4 last:mb-0;
+    }
+
+    .rich-text-content ul {
+        @apply mb-4 list-disc space-y-2 pl-6;
+    }
+
+    .rich-text-content ol {
+        @apply mb-4 list-decimal space-y-2 pl-6;
+    }
+
+    .rich-text-content li {
+        @apply text-muted-foreground;
+    }
+
+    .rich-text-content ul li::marker {
+        @apply text-primary;
+    }
+
+    .rich-text-content ol li::marker {
+        @apply font-semibold text-primary;
+    }
+
+    .rich-text-content a {
+        @apply font-medium text-primary underline underline-offset-2 transition-colors hover:text-primary/80;
+    }
+
+    .rich-text-content strong,
+    .rich-text-content b {
+        @apply font-semibold text-foreground;
+    }
+
+    .rich-text-content em,
+    .rich-text-content i {
+        @apply italic;
+    }
+
+    .rich-text-content u {
+        @apply underline;
+    }
+
+    .rich-text-content s,
+    .rich-text-content strike {
+        @apply line-through;
+    }
+
+    .rich-text-content blockquote {
+        @apply my-4 border-l-4 border-primary/50 bg-muted/30 py-2 pr-4 pl-4 italic;
+    }
+
+    .rich-text-content code {
+        @apply rounded bg-muted px-1.5 py-0.5 font-mono text-sm;
+    }
+
+    .rich-text-content pre {
+        @apply my-4 overflow-x-auto rounded-lg bg-muted p-4;
+    }
+
+    .rich-text-content pre code {
+        @apply bg-transparent p-0;
+    }
+
     /* Modern glassmorphism effect */
     .glass {
         @apply border border-border/50 bg-background/80 backdrop-blur-xl;
