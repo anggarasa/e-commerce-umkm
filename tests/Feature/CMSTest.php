@@ -38,6 +38,36 @@ describe('CMS Homepage Settings', function () {
     });
 });
 
+describe('CMS About Us Settings', function () {
+    it('can view about us CMS settings page', function () {
+        $this->actingAs($this->admin)
+            ->get('/admin/cms/about-us')
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('admin/cms/about-us'));
+    });
+
+    it('can update about us settings', function () {
+        // Create or update about us settings
+        Setting::updateOrCreate(['key' => 'about_us_hero_badge'], ['value' => 'Original Badge', 'type' => 'string', 'group' => 'about_us']);
+        Setting::updateOrCreate(['key' => 'about_us_hero_title'], ['value' => 'Original Title', 'type' => 'string', 'group' => 'about_us']);
+
+        $this->actingAs($this->admin)
+            ->put('/admin/cms/about-us', [
+                'about_us_hero_badge' => 'Updated Badge',
+                'about_us_hero_title' => 'Updated Title',
+            ])
+            ->assertRedirect();
+
+        expect(Setting::where('key', 'about_us_hero_badge')->first()->value)->toBe('Updated Badge');
+        expect(Setting::where('key', 'about_us_hero_title')->first()->value)->toBe('Updated Title');
+    });
+
+    it('requires authentication to access about us CMS', function () {
+        $this->get('/admin/cms/about-us')
+            ->assertRedirect('/login');
+    });
+});
+
 describe('Static Pages', function () {
     it('can view about us page', function () {
         $this->get('/about-us')
@@ -67,4 +97,16 @@ describe('Static Pages', function () {
                 ->has('homepageSettings')
             );
     });
+
+    it('about us page displays with CMS settings', function () {
+        Setting::updateOrCreate(['key' => 'about_us_hero_badge'], ['value' => 'Test Badge', 'type' => 'string', 'group' => 'about_us']);
+
+        $this->get('/about-us')
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('storefront/about-us')
+                ->has('aboutUsSettings')
+            );
+    });
 });
+

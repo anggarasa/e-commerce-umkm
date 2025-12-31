@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Setting;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -30,8 +31,11 @@ class StaticPageController extends Controller
      */
     public function aboutUs(): Response
     {
+        $aboutUsSettings = Setting::where('group', 'about_us')->get()->keyBy('key');
+
         return Inertia::render('storefront/about-us', [
             'categories' => $this->getCategories(),
+            'aboutUsSettings' => $aboutUsSettings,
         ]);
     }
 

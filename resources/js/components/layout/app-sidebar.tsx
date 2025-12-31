@@ -1,5 +1,8 @@
 import { index as categoriesIndex } from '@/actions/App/Http/Controllers/Admin/CategoryController';
-import { homepage as cmsHomepage } from '@/actions/App/Http/Controllers/Admin/CMSController';
+import {
+    aboutUs as cmsAboutUs,
+    homepage as cmsHomepage,
+} from '@/actions/App/Http/Controllers/Admin/CMSController';
 import { index as ordersIndex } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import { index as productsIndex } from '@/actions/App/Http/Controllers/Admin/ProductController';
 import { index as reportsIndex } from '@/actions/App/Http/Controllers/Admin/ReportController';
@@ -15,20 +18,32 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
+import { resolveUrl } from '@/lib/utils';
 import { dashboard } from '@/routes/admin';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@radix-ui/react-collapsible';
 import {
     BarChart3,
     BookOpen,
+    ChevronRight,
     ClipboardList,
     Folder,
     FolderTree,
+    Home,
     LayoutGrid,
     LayoutTemplate,
     Package,
     Settings,
+    Users,
 } from 'lucide-react';
 import AppLogo from '../branding/app-logo';
 
@@ -59,14 +74,22 @@ const mainNavItems: NavItem[] = [
         icon: BarChart3,
     },
     {
-        title: 'CMS',
-        href: cmsHomepage(),
-        icon: LayoutTemplate,
-    },
-    {
         title: 'Konfigurasi',
         href: settingsIndex(),
         icon: Settings,
+    },
+];
+
+const cmsSubItems = [
+    {
+        title: 'Homepage',
+        href: cmsHomepage(),
+        icon: Home,
+    },
+    {
+        title: 'Tentang Kami',
+        href: cmsAboutUs(),
+        icon: Users,
     },
 ];
 
@@ -84,6 +107,9 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const page = usePage();
+    const isCmsActive = page.url.startsWith('/admin/cms');
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader className="px-2">
@@ -104,6 +130,58 @@ export function AppSidebar() {
 
             <SidebarContent className="px-2">
                 <NavMain items={mainNavItems} />
+
+                {/* CMS Section with Submenu */}
+                <SidebarMenu className="mt-1">
+                    <Collapsible
+                        asChild
+                        defaultOpen={isCmsActive}
+                        className="group/collapsible"
+                    >
+                        <SidebarMenuItem>
+                            <CollapsibleTrigger asChild>
+                                <SidebarMenuButton
+                                    tooltip={{ children: 'CMS' }}
+                                    isActive={isCmsActive}
+                                    className="transition-all duration-200"
+                                >
+                                    <LayoutTemplate className="size-5" />
+                                    <span className="font-medium">CMS</span>
+                                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                </SidebarMenuButton>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent>
+                                <SidebarMenuSub>
+                                    {cmsSubItems.map((item) => {
+                                        const isActive = page.url.startsWith(
+                                            resolveUrl(item.href),
+                                        );
+                                        return (
+                                            <SidebarMenuSubItem
+                                                key={item.title}
+                                            >
+                                                <SidebarMenuSubButton
+                                                    asChild
+                                                    isActive={isActive}
+                                                >
+                                                    <Link
+                                                        href={item.href}
+                                                        prefetch
+                                                    >
+                                                        <item.icon className="size-4" />
+                                                        <span>
+                                                            {item.title}
+                                                        </span>
+                                                    </Link>
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                        );
+                                    })}
+                                </SidebarMenuSub>
+                            </CollapsibleContent>
+                        </SidebarMenuItem>
+                    </Collapsible>
+                </SidebarMenu>
             </SidebarContent>
 
             <SidebarFooter className="px-2">

@@ -34,5 +34,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::prefix('cms')->name('cms.')->group(function () {
         Route::get('/homepage', [\App\Http\Controllers\Admin\CMSController::class, 'homepage'])->name('homepage');
         Route::put('/homepage', [\App\Http\Controllers\Admin\CMSController::class, 'updateHomepage'])->name('homepage.update');
+        Route::get('/about-us', [\App\Http\Controllers\Admin\CMSController::class, 'aboutUs'])->name('about-us');
+        Route::put('/about-us', [\App\Http\Controllers\Admin\CMSController::class, 'updateAboutUs'])->name('about-us.update');
     });
 });
