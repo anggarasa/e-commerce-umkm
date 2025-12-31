@@ -168,4 +168,50 @@ class CMSController extends Controller
 
         return redirect()->back()->with('success', 'Privacy Policy settings updated successfully.');
     }
+
+    /**
+     * Display terms of service CMS settings.
+     */
+    public function termsOfService(): Response
+    {
+        $termsOfServiceSettings = Setting::where('group', 'terms_of_service')->get()->keyBy('key');
+
+        return Inertia::render('admin/cms/terms-of-service', [
+            'settings' => $termsOfServiceSettings,
+        ]);
+    }
+
+    /**
+     * Update terms of service CMS settings.
+     */
+    public function updateTermsOfService(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            // Hero Section
+            'terms_of_service_hero_title' => 'nullable|string|max:255',
+            'terms_of_service_hero_description' => 'nullable|string|max:500',
+            'terms_of_service_last_updated' => 'nullable|date',
+            // Sections
+            'terms_of_service_sections' => 'nullable|array',
+            'terms_of_service_sections.*.id' => 'required|string|max:50',
+            'terms_of_service_sections.*.icon' => 'required|string|max:50',
+            'terms_of_service_sections.*.title' => 'required|string|max:255',
+            'terms_of_service_sections.*.content' => 'required|string',
+            // Footer Note
+            'terms_of_service_footer_note' => 'nullable|string|max:1000',
+        ]);
+
+        $jsonFields = [
+            'terms_of_service_sections',
+        ];
+
+        foreach ($data as $key => $value) {
+            if (in_array($key, $jsonFields)) {
+                $value = json_encode($value);
+            }
+            Setting::where('key', $key)->update(['value' => $value]);
+        }
+
+        return redirect()->back()->with('success', 'Terms of Service settings updated successfully.');
+    }
 }

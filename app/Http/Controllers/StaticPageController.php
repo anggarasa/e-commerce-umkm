@@ -57,8 +57,11 @@ class StaticPageController extends Controller
      */
     public function termsOfService(): Response
     {
+        $termsOfServiceSettings = Setting::where('group', 'terms_of_service')->get()->keyBy('key');
+
         return Inertia::render('storefront/terms-of-service', [
             'categories' => $this->getCategories(),
+            'termsOfServiceSettings' => $termsOfServiceSettings,
         ]);
     }
 }

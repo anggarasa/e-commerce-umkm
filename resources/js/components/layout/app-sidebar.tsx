@@ -3,6 +3,7 @@ import {
     aboutUs as cmsAboutUs,
     homepage as cmsHomepage,
     privacyPolicy as cmsPrivacyPolicy,
+    termsOfService as cmsTermsOfService,
 } from '@/actions/App/Http/Controllers/Admin/CMSController';
 import { index as ordersIndex } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import { index as productsIndex } from '@/actions/App/Http/Controllers/Admin/ProductController';
@@ -43,6 +44,7 @@ import {
     LayoutGrid,
     LayoutTemplate,
     Package,
+    ScrollText,
     Settings,
     Users,
 } from 'lucide-react';
@@ -96,6 +98,11 @@ const cmsSubItems = [
         title: 'Kebijakan Privasi',
         href: cmsPrivacyPolicy(),
         icon: BookOpen,
+    },
+    {
+        title: 'Syarat & Ketentuan',
+        href: cmsTermsOfService(),
+        icon: ScrollText,
     },
 ];
 

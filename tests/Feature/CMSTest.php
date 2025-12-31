@@ -108,5 +108,56 @@ describe('Static Pages', function () {
                 ->has('aboutUsSettings')
             );
     });
+
+    it('privacy policy page displays with CMS settings', function () {
+        Setting::updateOrCreate(['key' => 'privacy_policy_hero_title'], ['value' => 'Test Title', 'type' => 'string', 'group' => 'privacy_policy']);
+
+        $this->get('/privacy-policy')
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('storefront/privacy-policy')
+                ->has('privacyPolicySettings')
+            );
+    });
+
+    it('terms of service page displays with CMS settings', function () {
+        Setting::updateOrCreate(['key' => 'terms_of_service_hero_title'], ['value' => 'Test Title', 'type' => 'string', 'group' => 'terms_of_service']);
+
+        $this->get('/terms-of-service')
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('storefront/terms-of-service')
+                ->has('termsOfServiceSettings')
+            );
+    });
 });
 
+describe('CMS Terms of Service Settings', function () {
+    it('can view terms of service CMS settings page', function () {
+        $this->actingAs($this->admin)
+            ->get('/admin/cms/terms-of-service')
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('admin/cms/terms-of-service'));
+    });
+
+    it('can update terms of service settings', function () {
+        // Create or update terms of service settings
+        Setting::updateOrCreate(['key' => 'terms_of_service_hero_title'], ['value' => 'Original Title', 'type' => 'string', 'group' => 'terms_of_service']);
+        Setting::updateOrCreate(['key' => 'terms_of_service_hero_description'], ['value' => 'Original Description', 'type' => 'string', 'group' => 'terms_of_service']);
+
+        $this->actingAs($this->admin)
+            ->put('/admin/cms/terms-of-service', [
+                'terms_of_service_hero_title' => 'Updated Title',
+                'terms_of_service_hero_description' => 'Updated Description',
+            ])
+            ->assertRedirect();
+
+        expect(Setting::where('key', 'terms_of_service_hero_title')->first()->value)->toBe('Updated Title');
+        expect(Setting::where('key', 'terms_of_service_hero_description')->first()->value)->toBe('Updated Description');
+    });
+
+    it('requires authentication to access terms of service CMS', function () {
+        $this->get('/admin/cms/terms-of-service')
+            ->assertRedirect('/login');
+    });
+});
