@@ -13,7 +13,13 @@ RUN apk add --no-cache \
     pdo_mysql \
     mbstring \
     intl \
-    zip
+    zip \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd
+
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
