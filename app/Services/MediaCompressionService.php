@@ -31,8 +31,11 @@ class MediaCompressionService
 
     private int $videoMaxHeight;
 
-    public function __construct()
+    private CloudinaryService $cloudinaryService;
+
+    public function __construct(CloudinaryService $cloudinaryService)
     {
+        $this->cloudinaryService = $cloudinaryService;
         $this->manager = new ImageManager(new Driver);
         $this->maxWidth = config('media.compression.max_width', 1920);
         $this->maxHeight = config('media.compression.max_height', 1920);
@@ -43,6 +46,14 @@ class MediaCompressionService
         $this->videoBitrate = config('media.video_compression.bitrate', 1000);
         $this->videoMaxWidth = config('media.video_compression.max_width', 1280);
         $this->videoMaxHeight = config('media.video_compression.max_height', 720);
+    }
+
+    /**
+     * Check if Cloudinary is enabled.
+     */
+    public function isCloudinaryEnabled(): bool
+    {
+        return $this->cloudinaryService->isEnabled();
     }
 
     /**
@@ -71,11 +82,23 @@ class MediaCompressionService
 
     /**
      * Compress and optionally resize the image, then store it.
+     * If Cloudinary is enabled, uploads to Cloudinary instead of local storage.
      *
-     * @return string The path to the stored compressed image
+     * @return array{path: string, thumbnail_path: string|null}
      */
-    public function compressAndStore(UploadedFile $file, string $directory = 'products'): string
+    public function compressAndStore(UploadedFile $file, string $directory = 'products'): array
     {
+        // Use Cloudinary if enabled
+        if ($this->isCloudinaryEnabled()) {
+            $result = $this->cloudinaryService->uploadImage($file, $directory);
+
+            return [
+                'path' => $result['path'],
+                'thumbnail_path' => $result['thumbnail_path'],
+            ];
+        }
+
+        // Local storage with compression
         $image = $this->manager->read($file->getRealPath());
 
         // Scale down if exceeds max dimensions (maintains aspect ratio)
@@ -91,16 +114,33 @@ class MediaCompressionService
         // Store the compressed image
         Storage::disk('public')->put($path, (string) $encoded);
 
-        return $path;
+        // Generate thumbnail
+        $thumbnailPath = $this->generateThumbnail($path, $directory.'/thumbnails');
+
+        return [
+            'path' => $path,
+            'thumbnail_path' => $thumbnailPath,
+        ];
     }
 
     /**
-     * Compress and store video using FFMpeg.
+     * Compress and store video using FFMpeg or Cloudinary.
      *
-     * @return string The path to the stored compressed video
+     * @return array{path: string, thumbnail_path: string|null}
      */
-    public function compressAndStoreVideo(UploadedFile $file, string $directory = 'products'): string
+    public function compressAndStoreVideo(UploadedFile $file, string $directory = 'products'): array
     {
+        // Use Cloudinary if enabled
+        if ($this->isCloudinaryEnabled()) {
+            $result = $this->cloudinaryService->uploadVideo($file, $directory);
+
+            return [
+                'path' => $result['path'],
+                'thumbnail_path' => $result['thumbnail_path'],
+            ];
+        }
+
+        // Local storage with FFMpeg compression
         // First, store the original file temporarily
         $tempPath = $file->store('temp', 'public');
 
@@ -132,13 +172,24 @@ class MediaCompressionService
             // Clean up temp file
             Storage::disk('public')->delete($tempPath);
 
-            return $outputPath;
+            // Generate video thumbnail
+            $thumbnailPath = $this->generateVideoThumbnail($outputPath, $directory.'/thumbnails');
+
+            return [
+                'path' => $outputPath,
+                'thumbnail_path' => $thumbnailPath,
+            ];
         } catch (\Exception $e) {
             // If compression fails, clean up and store without compression
             Storage::disk('public')->delete($tempPath);
 
             // Fall back to storing without compression
-            return $this->storeWithoutCompression($file, $directory);
+            $result = $this->storeWithoutCompression($file, $directory);
+
+            return [
+                'path' => $result,
+                'thumbnail_path' => null,
+            ];
         }
     }
 
@@ -224,6 +275,18 @@ class MediaCompressionService
      */
     public function storeWithoutCompression(UploadedFile $file, string $directory = 'products'): string
     {
+        // Use Cloudinary if enabled
+        if ($this->isCloudinaryEnabled()) {
+            $isVideo = str_starts_with($file->getMimeType(), 'video/');
+            if ($isVideo) {
+                $result = $this->cloudinaryService->uploadVideo($file, $directory);
+            } else {
+                $result = $this->cloudinaryService->uploadImage($file, $directory);
+            }
+
+            return $result['path'];
+        }
+
         return $file->store($directory, 'public');
     }
 
@@ -232,6 +295,19 @@ class MediaCompressionService
      */
     public function deleteMedia(string $path, ?string $thumbnailPath = null): void
     {
+        // Check if it's a Cloudinary URL
+        if ($this->cloudinaryService->isCloudinaryUrl($path)) {
+            $publicId = $this->cloudinaryService->extractPublicIdFromUrl($path);
+            if ($publicId) {
+                // Determine resource type from URL
+                $resourceType = str_contains($path, '/video/') ? 'video' : 'image';
+                $this->cloudinaryService->delete($publicId, $resourceType);
+            }
+
+            return;
+        }
+
+        // Local storage deletion
         if (Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
         }

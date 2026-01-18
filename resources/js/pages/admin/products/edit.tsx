@@ -75,7 +75,7 @@ export default function ProductsEdit({ product, categories }: Props) {
         if (product.media) {
             return product.media.map((m) => ({
                 id: m.id,
-                preview: `/storage/${m.path}`,
+                preview: m.url,
                 type: m.type,
                 is_primary: m.is_primary,
                 is_existing: true,

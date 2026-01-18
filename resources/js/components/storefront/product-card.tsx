@@ -15,7 +15,7 @@ interface ProductCardProps {
 export function ProductCard({ product, className }: ProductCardProps) {
     const primaryMedia =
         product.media?.find((m) => m.is_primary) || product.media?.[0];
-    const imageUrl = primaryMedia?.thumbnail_url || primaryMedia?.url;
+    const imageUrl = primaryMedia?.url;
     const isOutOfStock = product.stock <= 0;
 
     return (

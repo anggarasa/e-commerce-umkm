@@ -259,7 +259,10 @@ export default function OrdersShow({ order, statuses }: Props) {
                                             <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
                                                 {item.product?.media?.[0] ? (
                                                     <img
-                                                        src={`/storage/${item.product.media[0].path}`}
+                                                        src={
+                                                            item.product
+                                                                .media[0].url
+                                                        }
                                                         alt={item.product_name}
                                                         className="size-full object-cover"
                                                     />

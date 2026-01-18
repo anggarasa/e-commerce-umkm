@@ -49,4 +49,32 @@ return [
         'max_height' => env('VIDEO_MAX_HEIGHT', 720),
         'format' => 'mp4',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cloudinary Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configure Cloudinary cloud storage for media files.
+    | When enabled, media will be uploaded to Cloudinary instead of local storage.
+    |
+    */
+
+    'cloudinary' => [
+        'enabled' => env('CLOUDINARY_ENABLED', false),
+        'folder' => 'products',
+        'image_transformation' => [
+            'quality' => 'auto:good',
+            'fetch_format' => 'auto',
+        ],
+        'video_transformation' => [
+            'quality' => 'auto:good',
+            'fetch_format' => 'auto',
+        ],
+        'thumbnail' => [
+            'width' => 400,
+            'height' => 400,
+            'crop' => 'fill',
+        ],
+    ],
 ];

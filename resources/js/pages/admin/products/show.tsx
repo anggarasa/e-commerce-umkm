@@ -118,13 +118,13 @@ export default function ProductsShow({ product }: Props) {
                                     {selectedMedia ? (
                                         selectedMedia.type === 'image' ? (
                                             <img
-                                                src={`/storage/${selectedMedia.path}`}
+                                                src={selectedMedia.url}
                                                 alt={product.name}
                                                 className="size-full object-cover transition-transform duration-300 hover:scale-105"
                                             />
                                         ) : (
                                             <video
-                                                src={`/storage/${selectedMedia.path}`}
+                                                src={selectedMedia.url}
                                                 controls
                                                 className="size-full object-contain"
                                             />
@@ -162,7 +162,7 @@ export default function ProductsShow({ product }: Props) {
                                             >
                                                 {media.type === 'image' ? (
                                                     <img
-                                                        src={`/storage/${media.path}`}
+                                                        src={media.url}
                                                         alt="Thumbnail"
                                                         className="size-full object-cover"
                                                     />

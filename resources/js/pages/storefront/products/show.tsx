@@ -181,9 +181,7 @@ export default function ProductShow({
                                         )}
                                     >
                                         <img
-                                            src={
-                                                media.thumbnail_url || media.url
-                                            }
+                                            src={media.url}
                                             alt=""
                                             className="h-full w-full object-cover"
                                         />

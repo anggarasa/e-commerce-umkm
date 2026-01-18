@@ -460,7 +460,11 @@ export default function OrderShow({ order, statuses, isOwner }: Props) {
                                                     {item.product
                                                         ?.media?.[0] ? (
                                                         <img
-                                                            src={`/storage/${item.product.media[0].path}`}
+                                                            src={
+                                                                item.product
+                                                                    .media[0]
+                                                                    .url
+                                                            }
                                                             alt={
                                                                 item.product_name
                                                             }

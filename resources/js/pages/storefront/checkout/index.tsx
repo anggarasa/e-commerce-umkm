@@ -307,7 +307,9 @@ export default function CheckoutIndex({
                                                                 item.product
                                                                     .media[0]
                                                                     .url ||
-                                                                `/storage/${item.product.media[0].path}`
+                                                                item.product
+                                                                    .media[0]
+                                                                    .url
                                                             }
                                                             alt={
                                                                 item.product

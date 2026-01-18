@@ -72,21 +72,19 @@ class ProductController extends Controller
                     $file = $request->file("new_media.{$index}.file");
                     $isImage = $mediaMeta['type'] === 'image';
 
-                    // Compress images and videos
+                    // Compress and store (handles both Cloudinary and local storage)
                     if ($isImage && $this->mediaService->shouldCompress($file)) {
-                        $path = $this->mediaService->compressAndStore($file, 'products');
-                        $thumbnailPath = $this->mediaService->generateThumbnail($path, 'products/thumbnails');
+                        $result = $this->mediaService->compressAndStore($file, 'products');
                     } elseif (! $isImage && $this->mediaService->shouldCompressVideo($file)) {
-                        $path = $this->mediaService->compressAndStoreVideo($file, 'products');
-                        $thumbnailPath = $this->mediaService->generateVideoThumbnail($path, 'products/thumbnails');
+                        $result = $this->mediaService->compressAndStoreVideo($file, 'products');
                     } else {
                         $path = $this->mediaService->storeWithoutCompression($file, 'products');
-                        $thumbnailPath = null;
+                        $result = ['path' => $path, 'thumbnail_path' => null];
                     }
 
                     $product->media()->create([
-                        'path' => $path,
-                        'thumbnail_path' => $thumbnailPath,
+                        'path' => $result['path'],
+                        'thumbnail_path' => $result['thumbnail_path'],
                         'type' => $mediaMeta['type'],
                         'is_primary' => filter_var($mediaMeta['is_primary'] ?? false, FILTER_VALIDATE_BOOLEAN),
                         'sort_order' => $index,
@@ -142,21 +140,19 @@ class ProductController extends Controller
                     $file = $request->file("new_media.{$index}.file");
                     $isImage = $mediaMeta['type'] === 'image';
 
-                    // Compress images and videos
+                    // Compress and store (handles both Cloudinary and local storage)
                     if ($isImage && $this->mediaService->shouldCompress($file)) {
-                        $path = $this->mediaService->compressAndStore($file, 'products');
-                        $thumbnailPath = $this->mediaService->generateThumbnail($path, 'products/thumbnails');
+                        $result = $this->mediaService->compressAndStore($file, 'products');
                     } elseif (! $isImage && $this->mediaService->shouldCompressVideo($file)) {
-                        $path = $this->mediaService->compressAndStoreVideo($file, 'products');
-                        $thumbnailPath = $this->mediaService->generateVideoThumbnail($path, 'products/thumbnails');
+                        $result = $this->mediaService->compressAndStoreVideo($file, 'products');
                     } else {
                         $path = $this->mediaService->storeWithoutCompression($file, 'products');
-                        $thumbnailPath = null;
+                        $result = ['path' => $path, 'thumbnail_path' => null];
                     }
 
                     $product->media()->create([
-                        'path' => $path,
-                        'thumbnail_path' => $thumbnailPath,
+                        'path' => $result['path'],
+                        'thumbnail_path' => $result['thumbnail_path'],
                         'type' => $mediaMeta['type'],
                         'is_primary' => filter_var($mediaMeta['is_primary'] ?? false, FILTER_VALIDATE_BOOLEAN),
                         'sort_order' => $currentMaxSort + 1 + $index,

@@ -169,7 +169,10 @@ export default function ProductsIndex({
                 <div className="flex size-10 items-center justify-center overflow-hidden rounded-md bg-muted">
                     {product.media && product.media.length > 0 ? (
                         <img
-                            src={`/storage/${product.media.find((m) => m.is_primary)?.path || product.media[0].path}`}
+                            src={
+                                product.media.find((m) => m.is_primary)?.url ||
+                                product.media[0].url
+                            }
                             alt={product.name}
                             className="size-full object-cover"
                         />
