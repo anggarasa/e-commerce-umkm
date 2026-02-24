@@ -28,7 +28,7 @@ import { ReactNode } from 'react';
 
 import { CategoryCard } from '@/components/storefront/category-card';
 import { ProductCard } from '@/components/storefront/product-card';
-import { WelcomeModal } from '@/components/storefront/welcome-modal';
+// import { WelcomeModal } from '@/components/storefront/welcome-modal';
 import { Button } from '@/components/ui/button';
 import StorefrontLayout from '@/layouts/storefront-layout';
 import { index as productsIndex } from '@/routes/products';
@@ -148,7 +148,7 @@ export default function Welcome({
 
     return (
         <>
-            <WelcomeModal />
+            {/* <WelcomeModal /> */}
             <StorefrontLayout title="Beranda" categories={featuredCategories}>
                 {/* Hero Section */}
                 <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-primary/10">
